@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('sale_id')->unique()->constrained('sales')->cascadeOnDelete();
             $table->text('delivery_address');
             $table->timestamp('scheduled_at')->nullable();
-            $table->string('status', 50)->default('pending');
+            $table->enum('status', ['pending', 'delivering', 'completed', 'cancelled'])->default('pending');
             $table->timestamp('started_at')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->foreignId('courier_id')->nullable()->constrained('users')->nullOnDelete();

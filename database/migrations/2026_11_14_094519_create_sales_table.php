@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users')->restrictOnDelete();
             $table->string('customer_name')->nullable();
-            $table->string('order_type', 50)->default('offline');
+            $table->enum('order_type', ['direct', 'delivery'])
+                ->default('direct');
             $table->decimal('total_amount', 15, 2)->default(0);
             $table->timestamps();
         });

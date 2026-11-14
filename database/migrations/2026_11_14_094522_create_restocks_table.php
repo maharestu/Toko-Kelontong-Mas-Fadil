@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('restocks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users')->restrictOnDelete();
             $table->date('restock_date');
             $table->text('notes')->nullable();
             $table->decimal('total_cost', 15, 2)->default(0);
