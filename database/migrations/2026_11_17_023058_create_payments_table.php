@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('sale_id')->constrained('sales')->restrictOnDelete();
             $table->foreignId('user_id')->constrained('users')->restrictOnDelete();
             $table->decimal('amount', 15, 2);
-            $table->string('payment_method', 50)->default('cash');
+            $table->enum('payment_method', ['tunai', 'transfer', 'qris'])->default('tunai');
             $table->timestamp('paid_at')->useCurrent();
             $table->text('notes')->nullable();
             $table->timestamp('created_at')->nullable()->useCurrent();
