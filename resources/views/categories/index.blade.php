@@ -186,7 +186,7 @@
         </form>
     </x-modal>
 
-    <!-- Modal Konfirmasi Hapus (Presisi Sesuai Desain Figma) -->
+    <!-- Modal Konfirmasi Hapus -->
     <x-modal id="modal-delete-category" maxWidth="sm">
         <form id="form-delete-category" method="POST" action="">
             @csrf
