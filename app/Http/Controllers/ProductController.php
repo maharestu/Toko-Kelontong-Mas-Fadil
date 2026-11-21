@@ -41,8 +41,30 @@ class ProductController extends Controller
             ->withQueryString();
 
         $categories = Category::orderBy('name', 'asc')->get();
+        $totalProductsCount = Product::count();
+        $lowStockCount = Product::where('stock', '<=', 10)->count();
 
-        return view('products.index', compact('products', 'categories'));
+        return view('products.index', compact('products', 'categories', 'totalProductsCount', 'lowStockCount'));
+    }
+
+    /**
+     * Show the form for creating a new product.
+     */
+    public function create(): View
+    {
+        $categories = Category::orderBy('name', 'asc')->get();
+
+        return view('products.create', compact('categories'));
+    }
+
+    /**
+     * Show the form for editing the specified product.
+     */
+    public function edit(Product $product): View
+    {
+        $categories = Category::orderBy('name', 'asc')->get();
+
+        return view('products.edit', compact('product', 'categories'));
     }
 
     /**

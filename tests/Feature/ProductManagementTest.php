@@ -48,8 +48,39 @@ class ProductManagementTest extends TestCase
         $response = $this->get(route('products.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Katalog Produk');
+        $response->assertSee('Kelola Produk');
         $response->assertSee('Beras Pandan Wangi 5kg');
+    }
+
+    public function test_renders_product_create_page_successfully(): void
+    {
+        Category::create(['name' => 'Sembako']);
+
+        $response = $this->get(route('products.create'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Tambah Produk Baru');
+        $response->assertSee('Satuan Kemasan');
+    }
+
+    public function test_renders_product_edit_page_successfully(): void
+    {
+        $category = Category::create(['name' => 'Sembako']);
+        $product = Product::create([
+            'category_id' => $category->id,
+            'name' => 'Minyak Goreng Bimoli',
+            'unit' => 'pouch',
+            'stock' => 20,
+            'current_purchase_price' => 17000,
+            'current_selling_price' => 20000,
+            'is_active' => true,
+        ]);
+
+        $response = $this->get(route('products.edit', $product));
+
+        $response->assertStatus(200);
+        $response->assertSee('Edit Produk');
+        $response->assertSee('Minyak Goreng Bimoli');
     }
 
     public function test_filters_products_by_search_keyword(): void
