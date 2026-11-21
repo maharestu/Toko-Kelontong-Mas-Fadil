@@ -19,7 +19,7 @@ class CategoryController extends Controller
         $query = Category::withCount('products');
 
         if ($search = $request->filled('search')) {
-            $keyword = '%' . strtolower(trim((string) $request->input('search'))) . '%';
+            $keyword = '%'.strtolower(trim((string) $request->input('search'))).'%';
             $query->whereRaw('LOWER(name) LIKE ?', [$keyword]);
         }
 
@@ -75,4 +75,3 @@ class CategoryController extends Controller
             ->with('success', "Kategori '{$category->name}' berhasil dihapus.");
     }
 }
-

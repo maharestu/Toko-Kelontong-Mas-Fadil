@@ -19,7 +19,7 @@ class RestockSeeder extends Seeder
     public function run(): void
     {
         $admin = User::where('role', 'admin')->first() ?? User::first();
-        if (!$admin) {
+        if (! $admin) {
             return;
         }
 
@@ -56,7 +56,7 @@ class RestockSeeder extends Seeder
 
             $totalCost1 = 0;
             foreach ($itemsBatch1 as $productName => $item) {
-                if (!isset($allProducts[$productName])) {
+                if (! isset($allProducts[$productName])) {
                     continue;
                 }
                 $product = $allProducts[$productName];
@@ -106,7 +106,7 @@ class RestockSeeder extends Seeder
 
             $totalCost2 = 0;
             foreach ($itemsBatch2 as $productName => $item) {
-                if (!isset($allProducts[$productName])) {
+                if (! isset($allProducts[$productName])) {
                     continue;
                 }
                 $product = $allProducts[$productName];
