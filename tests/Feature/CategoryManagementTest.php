@@ -46,7 +46,6 @@ class CategoryManagementTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Sembako');
         $response->assertSee('1 Produk terhubung');
-        $response->assertSee('UTAMA');
     }
 
     public function test_stores_new_category_successfully(): void

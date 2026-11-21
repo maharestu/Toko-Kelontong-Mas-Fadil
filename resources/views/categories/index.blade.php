@@ -74,64 +74,16 @@
             </form>
         @endif
 
-        <!-- Daftar Kategori Cards -->
+        <!-- Daftar Kategori Cards (Hanya Teks & Aksi) -->
         <div class="space-y-2.5 mb-4">
             @forelse ($categories as $category)
-                @php
-                    $isUtama = in_array(strtolower(trim($category->name)), ['sembako', 'kebutuhan pokok']);
-                    $hasProducts = ($category->products_count > 0);
-                    $lowerName = strtolower($category->name);
-                @endphp
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-xs p-3.5 flex items-center justify-between gap-3 hover:border-gray-200 transition-all">
-                    <!-- Icon & Nama Kategori -->
-                    <div class="flex items-center gap-3 min-w-0">
-                        <!-- Icon Box -->
-                        <div class="w-11 h-11 rounded-xl bg-gray-50/90 border border-gray-100 flex items-center justify-center shrink-0 text-gray-700">
-                            @if (str_contains($lowerName, 'sembako') || str_contains($lowerName, 'beras'))
-                                <svg class="w-5 h-5 stroke-[1.8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                </svg>
-                            @elseif (str_contains($lowerName, 'gas') || str_contains($lowerName, 'galon'))
-                                <svg class="w-5 h-5 stroke-[1.8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                </svg>
-                            @elseif (str_contains($lowerName, 'minum'))
-                                <svg class="w-5 h-5 stroke-[1.8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16zM9 9h6" />
-                                </svg>
-                            @elseif (str_contains($lowerName, 'makan') || str_contains($lowerName, 'biskuit') || str_contains($lowerName, 'snack'))
-                                <svg class="w-5 h-5 stroke-[1.8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18zM9 10h.01M15 10h.01M9 14h6" />
-                                </svg>
-                            @elseif (str_contains($lowerName, 'bumbu') || str_contains($lowerName, 'masak'))
-                                <svg class="w-5 h-5 stroke-[1.8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                </svg>
-                            @elseif (str_contains($lowerName, 'rumah') || str_contains($lowerName, 'bersih') || str_contains($lowerName, 'sabun'))
-                                <svg class="w-5 h-5 stroke-[1.8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                </svg>
-                            @else
-                                <svg class="w-5 h-5 stroke-[1.8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                                </svg>
-                            @endif
-                        </div>
-
-                        <!-- Teks -->
-                        <div class="truncate">
-                            <div class="flex items-center gap-1.5 flex-wrap">
-                                <h3 class="text-sm font-bold text-gray-900 truncate">{{ $category->name }}</h3>
-                                @if ($isUtama)
-                                    <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-1.5 py-0.5 rounded tracking-wide uppercase">
-                                        UTAMA
-                                    </span>
-                                @endif
-                            </div>
-                            <p class="text-xs text-gray-500 font-medium mt-0.5">
-                                {{ $category->products_count }} Produk terhubung
-                            </p>
-                        </div>
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-xs p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:border-gray-200 transition-all">
+                    <!-- Nama Kategori & Info Produk -->
+                    <div class="min-w-0 pr-2">
+                        <h3 class="text-sm sm:text-base font-bold text-gray-900 truncate">{{ $category->name }}</h3>
+                        <p class="text-xs text-gray-500 font-medium mt-0.5">
+                            {{ $category->products_count }} Produk terhubung
+                        </p>
                     </div>
 
                     <!-- Tombol Aksi di Kanan -->
@@ -141,35 +93,24 @@
                             type="button" 
                             onclick="openEditModal({{ $category->id }}, '{{ addslashes($category->name) }}')"
                             title="Edit Kategori"
-                            class="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors cursor-pointer"
+                            class="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors cursor-pointer"
                         >
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
                         </button>
 
-                        <!-- Tombol Hapus / Gembok Terkunci -->
-                        @if ($hasProducts || $isUtama)
-                            <div 
-                                title="Kategori ini terlindungi karena masih digunakan oleh {{ $category->products_count }} produk."
-                                class="p-2 rounded-xl bg-gray-100/70 text-gray-400 cursor-not-allowed"
-                            >
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
-                            </div>
-                        @else
-                            <button 
-                                type="button" 
-                                onclick="openDeleteModal({{ $category->id }}, '{{ addslashes($category->name) }}')"
-                                title="Hapus Kategori"
-                                class="p-2 rounded-xl bg-gray-100 hover:bg-rose-50 text-gray-700 hover:text-rose-600 transition-colors cursor-pointer"
-                            >
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
-                        @endif
+                        <!-- Tombol Hapus -->
+                        <button 
+                            type="button" 
+                            onclick="openDeleteModal({{ $category->id }}, '{{ addslashes($category->name) }}')"
+                            title="Hapus Kategori"
+                            class="p-2.5 rounded-xl bg-gray-100 hover:bg-rose-50 text-gray-700 hover:text-rose-600 transition-colors cursor-pointer"
+                        >
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
             @empty
@@ -207,13 +148,14 @@
     </div>
 
     <!-- Modal Edit Kategori -->
-    <x-modal id="modal-edit-category" title="Edit Kategori">
+    <x-modal id="modal-edit-category" maxWidth="sm">
         <form id="form-edit-category" method="POST" action="">
             @csrf
             @method('PUT')
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Edit Kategori</h3>
             <div class="space-y-4">
                 <div>
-                    <label for="edit_category_name" class="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wider">
+                    <label for="edit_category_name" class="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wider">
                         Nama Kategori
                     </label>
                     <input 
@@ -226,40 +168,49 @@
                     >
                 </div>
             </div>
-            <div class="mt-5 flex items-center justify-end gap-2">
-                <x-button type="button" variant="secondary" onclick="closeModal('modal-edit-category')">
+            <div class="mt-6 flex items-center justify-end gap-2.5">
+                <button 
+                    type="button" 
+                    onclick="closeModal('modal-edit-category')"
+                    class="py-2.5 px-4 border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-colors cursor-pointer"
+                >
                     Batal
-                </x-button>
-                <x-button type="submit" variant="primary">
+                </button>
+                <button 
+                    type="submit" 
+                    class="py-2.5 px-5 bg-[#133c30] hover:bg-[#0e2a22] rounded-xl text-sm font-semibold text-white transition-colors cursor-pointer shadow-xs"
+                >
                     Simpan Perubahan
-                </x-button>
+                </button>
             </div>
         </form>
     </x-modal>
 
-    <!-- Modal Konfirmasi Hapus -->
-    <x-modal id="modal-delete-category" title="Hapus Kategori">
+    <!-- Modal Konfirmasi Hapus (Presisi Sesuai Desain Figma) -->
+    <x-modal id="modal-delete-category" maxWidth="sm">
         <form id="form-delete-category" method="POST" action="">
             @csrf
             @method('DELETE')
-            <div class="text-center py-2">
-                <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-3">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                </div>
-                <h4 class="text-sm font-bold text-gray-900">Yakin ingin menghapus?</h4>
-                <p class="text-xs text-gray-500 mt-1">
-                    Kategori <span id="delete_category_name" class="font-bold text-gray-800"></span> akan dihapus permanen dari sistem.
+            <div class="py-1">
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Hapus Kategori?</h3>
+                <p class="text-sm text-gray-500 leading-relaxed mb-6">
+                    Hapus <span id="delete_category_name" class="font-medium text-gray-800">“Sembako”</span> dari kategori? Tindakan ini tidak dapat dibatalkan.
                 </p>
-            </div>
-            <div class="mt-5 flex items-center justify-end gap-2">
-                <x-button type="button" variant="secondary" onclick="closeModal('modal-delete-category')">
-                    Batal
-                </x-button>
-                <x-button type="submit" variant="danger">
-                    Ya, Hapus
-                </x-button>
+                <div class="flex items-center gap-3 w-full">
+                    <button 
+                        type="button" 
+                        onclick="closeModal('modal-delete-category')" 
+                        class="flex-1 py-3 px-4 border border-gray-300 rounded-2xl text-sm font-semibold text-gray-800 bg-white hover:bg-gray-50 transition-colors text-center cursor-pointer"
+                    >
+                        Batal
+                    </button>
+                    <button 
+                        type="submit" 
+                        class="flex-1 py-3 px-4 bg-[#b91c1c] hover:bg-[#991b1b] rounded-2xl text-sm font-semibold text-white transition-colors text-center cursor-pointer shadow-xs"
+                    >
+                        Hapus Kategori
+                    </button>
+                </div>
             </div>
         </form>
     </x-modal>
@@ -307,10 +258,9 @@
             const form = document.getElementById('form-delete-category');
             const label = document.getElementById('delete_category_name');
             form.action = `/categories/${id}`;
-            label.textContent = `"${name}"`;
+            label.textContent = `“${name}”`;
             openModal('modal-delete-category');
         }
     </script>
     @endpush
 </x-layouts.app>
-
