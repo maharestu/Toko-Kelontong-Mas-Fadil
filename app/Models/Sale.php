@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\OrderType;
+use App\Enums\PaymentType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,7 +23,6 @@ class Sale extends Model
         'total_amount',
         'payment_type',
         'due_date',
-        'created_at',
     ];
 
     protected function casts(): array
@@ -29,6 +30,8 @@ class Sale extends Model
         return [
             'total_amount' => 'decimal:2',
             'due_date' => 'date',
+            'order_type' => OrderType::class,
+            'payment_type' => PaymentType::class,
         ];
     }
 

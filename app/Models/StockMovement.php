@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\MovementType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,13 +19,13 @@ class StockMovement extends Model
         'quantity_change',
         'reference_type',
         'reference_id',
-        'created_at',
     ];
 
     protected function casts(): array
     {
         return [
             'quantity_change' => 'integer',
+            'movement_type' => MovementType::class,
         ];
     }
 

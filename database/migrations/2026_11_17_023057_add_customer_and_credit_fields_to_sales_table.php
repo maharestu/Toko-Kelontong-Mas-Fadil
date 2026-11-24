@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::table('sales', function (Blueprint $table) {
             $table->foreignId('customer_id')->nullable()->after('user_id')->constrained('customers')->restrictOnDelete();
-            $table->enum('payment_type', ['tunai', 'kredit'])->default('tunai')->after('total_amount');
+            $table->enum('payment_type', ['langsung', 'kredit'])
+                ->default('langsung')->after('total_amount');
             $table->date('due_date')->nullable()->after('payment_type');
         });
     }
