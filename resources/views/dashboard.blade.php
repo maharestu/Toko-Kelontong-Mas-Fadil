@@ -95,19 +95,17 @@
                 <span class="text-[11px] font-semibold text-gray-700">Kas Masuk</span>
             </button>
 
-            <!-- Stok Baru -->
-            <button type="button" class="bg-white rounded-2xl p-3 border border-gray-100 shadow-[0_1px_4px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center gap-2 hover:bg-gray-50 active:scale-95 transition-all">
-                <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-700">
+            <!-- Cek Stok -->
+            <a href="{{ route('restocks.index') }}" class="bg-white rounded-2xl p-3 border border-gray-100 shadow-[0_1px_4px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center gap-2 hover:bg-gray-50 active:scale-95 transition-all">
+                <div class="w-8 h-8 rounded-full bg-emerald-50 text-[#123b28] flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 5v14"/>
-                        <path d="M8 5v14"/>
-                        <path d="M12 5v14"/>
-                        <path d="M17 5v14"/>
-                        <path d="M21 5v14"/>
+                        <path d="m21.12 6.4-6-3.4a2 2 0 0 0-2 0l-6 3.4a2 2 0 0 0-1 1.7v6.8a2 2 0 0 0 1 1.7l6 3.4a2 2 0 0 0 2 0l6-3.4a2 2 0 0 0 1-1.7V8.1a2 2 0 0 0-1-1.7z"/>
+                        <path d="m3.3 7 8.7 5 8.7-5"/>
+                        <path d="M12 22V12"/>
                     </svg>
                 </div>
-                <span class="text-[11px] font-semibold text-gray-700">Stok Baru</span>
-            </button>
+                <span class="text-[11px] font-semibold text-gray-700">Cek Stok</span>
+            </a>
 
             <!-- Cek Kasbon -->
             <button type="button" class="bg-white rounded-2xl p-3 border border-gray-100 shadow-[0_1px_4px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center gap-2 hover:bg-gray-50 active:scale-95 transition-all">
@@ -168,7 +166,7 @@
                         {{ $criticalCount > 0 ? $criticalCount : 4 }} Kritis
                     </span>
                 </div>
-                <a href="#" class="text-[11px] font-semibold text-gray-800 hover:text-black flex items-center gap-1 transition">
+                <a href="{{ route('restocks.index') }}" class="text-[11px] font-semibold text-gray-800 hover:text-black flex items-center gap-1 transition">
                     <span>Catat Restock</span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M5 12h14"/>
