@@ -1,8 +1,9 @@
 <?php
 
+use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RestockController;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +34,11 @@ Route::get('/lainnya', function () {
 })->middleware(['auth', 'verified'])->name('lainnya');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Modul Kasir / Transaksi Penjualan
+    Route::get('/kasir', [CashierController::class, 'index'])->name('cashier.index');
+    Route::post('/kasir', [CashierController::class, 'store'])->name('cashier.store');
+    Route::get('/sales', [CashierController::class, 'index'])->name('sales.index');
+
     Route::get('/restocks', [RestockController::class, 'index'])->name('restocks.index');
     Route::post('/restocks', [RestockController::class, 'store'])->name('restocks.store');
 });

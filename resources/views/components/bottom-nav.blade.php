@@ -19,7 +19,7 @@
         [
             'id' => 'kasir',
             'label' => 'Kasir',
-            'url' => Route::has('sales.index') ? route('sales.index') : '#',
+            'url' => Route::has('cashier.index') ? route('cashier.index') : (Route::has('sales.index') ? route('sales.index') : '#'),
             'icon' => 'register',
         ],
         [
@@ -31,7 +31,7 @@
         [
             'id' => 'lainnya',
             'label' => 'Lainnya',
-            'url' => '#',
+            'url' => route('lainnya'),
             'icon' => 'grid',
         ],
     ];

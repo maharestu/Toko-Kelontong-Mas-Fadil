@@ -27,42 +27,42 @@
                 <nav class="sticky bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-100 px-3 py-2.5 z-30">
                     <div class="grid grid-cols-5 items-center justify-items-center">
                         <!-- Home (Active) -->
-                        <a href="{{ route('dashboard') }}" class="flex flex-col items-center gap-1 text-[#173628]">
+                        <a href="{{ route('dashboard') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('dashboard') ? 'text-[#173628]' : 'text-gray-400 hover:text-gray-700 transition' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
                                 <polyline points="9 22 9 12 15 12 15 22"/>
                             </svg>
-                            <span class="text-[10px] font-semibold tracking-tight">Home</span>
+                            <span class="text-[10px] {{ request()->routeIs('dashboard') ? 'font-semibold text-[#173628]' : 'font-medium' }} tracking-tight">Home</span>
                         </a>
 
                         <!-- Produk -->
-                        <a href="#" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-700 transition">
+                        <a href="{{ route('products.index') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('products.*') ? 'text-[#173628]' : 'text-gray-400 hover:text-gray-700 transition' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect width="20" height="14" x="2" y="7" rx="2" ry="2"/>
                                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
                             </svg>
-                            <span class="text-[10px] font-medium tracking-tight">Produk</span>
+                            <span class="text-[10px] {{ request()->routeIs('products.*') ? 'font-semibold text-[#173628]' : 'font-medium' }} tracking-tight">Produk</span>
                         </a>
 
                         <!-- Kasir -->
-                        <a href="#" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-700 transition">
+                        <a href="{{ route('cashier.index') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('cashier.*') || request()->routeIs('sales.*') ? 'text-[#173628]' : 'text-gray-400 hover:text-gray-700 transition' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect width="18" height="18" x="3" y="3" rx="2"/>
                                 <path d="M3 9h18"/>
                                 <path d="M9 21V9"/>
                             </svg>
-                            <span class="text-[10px] font-medium tracking-tight">Kasir</span>
+                            <span class="text-[10px] {{ request()->routeIs('cashier.*') || request()->routeIs('sales.*') ? 'font-semibold text-[#173628]' : 'font-medium' }} tracking-tight">Kasir</span>
                         </a>
 
                         <!-- Kategori -->
-                        <a href="#" class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-700 transition">
+                        <a href="{{ route('categories.index') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('categories.*') ? 'text-[#173628]' : 'text-gray-400 hover:text-gray-700 transition' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect width="7" height="7" x="3" y="3" rx="1"/>
                                 <rect width="7" height="7" x="14" y="3" rx="1"/>
                                 <rect width="7" height="7" x="14" y="14" rx="1"/>
                                 <rect width="7" height="7" x="3" y="14" rx="1"/>
                             </svg>
-                            <span class="text-[10px] font-medium tracking-tight">Kategori</span>
+                            <span class="text-[10px] {{ request()->routeIs('categories.*') ? 'font-semibold text-[#173628]' : 'font-medium' }} tracking-tight">Kategori</span>
                         </a>
 
                         <!-- Lainnya / Profile -->
