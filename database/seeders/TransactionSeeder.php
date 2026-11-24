@@ -31,7 +31,7 @@ class TransactionSeeder extends Seeder
         $customers = Customer::all()->keyBy('name');
         $products = Product::all()->keyBy('name');
 
-        if (!$kasir || $products->isEmpty()) {
+        if (! $kasir || $products->isEmpty()) {
             return;
         }
 
@@ -45,7 +45,7 @@ class TransactionSeeder extends Seeder
                 $detailsToInsert = [];
 
                 foreach ($items as $productName => $qty) {
-                    if (!isset($products[$productName])) {
+                    if (! isset($products[$productName])) {
                         continue;
                     }
                     $product = $products[$productName];
