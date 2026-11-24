@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\MovementType;
 use App\Models\Product;
 use App\Models\Restock;
 use App\Models\RestockDetail;
@@ -31,7 +32,7 @@ class RestockSeeder extends Seeder
         DB::transaction(function () use ($admin, $allProducts) {
             // Batch 1: Kulakan Awal Toko (45 hari lalu)
             $dateBatch1 = Carbon::now()->subDays(45);
-            $restock1 = Restock::create([
+            $restock1 = Restock::forceCreate([
                 'user_id' => $admin->id,
                 'restock_date' => $dateBatch1->toDateString(),
                 'notes' => 'Kulakan modal stok awal toko kelontong dari agen distributor pusat.',
@@ -63,7 +64,7 @@ class RestockSeeder extends Seeder
                 $subtotal = $item['qty'] * $item['buy'];
                 $totalCost1 += $subtotal;
 
-                RestockDetail::create([
+                RestockDetail::forceCreate([
                     'restock_id' => $restock1->id,
                     'product_id' => $product->id,
                     'quantity' => $item['qty'],
@@ -74,22 +75,25 @@ class RestockSeeder extends Seeder
                     'updated_at' => $dateBatch1,
                 ]);
 
-                StockMovement::create([
+                StockMovement::forceCreate([
                     'product_id' => $product->id,
                     'user_id' => $admin->id,
-                    'movement_type' => 'restock',
+                    'movement_type' => MovementType::Restock,
                     'quantity_change' => $item['qty'],
                     'reference_type' => Restock::class,
                     'reference_id' => $restock1->id,
                     'created_at' => $dateBatch1,
                     'updated_at' => $dateBatch1,
                 ]);
+
+                // Update kolom stok produk di tabel products
+                $product->increment('stock', $item['qty']);
             }
             $restock1->update(['total_cost' => $totalCost1]);
 
             // Batch 2: Kulakan Tambahan (14 hari lalu)
             $dateBatch2 = Carbon::now()->subDays(14);
-            $restock2 = Restock::create([
+            $restock2 = Restock::forceCreate([
                 'user_id' => $admin->id,
                 'restock_date' => $dateBatch2->toDateString(),
                 'notes' => 'Restock pengisian sembako cepat habis (Beras, Telur, Mie).',
@@ -113,7 +117,7 @@ class RestockSeeder extends Seeder
                 $subtotal = $item['qty'] * $item['buy'];
                 $totalCost2 += $subtotal;
 
-                RestockDetail::create([
+                RestockDetail::forceCreate([
                     'restock_id' => $restock2->id,
                     'product_id' => $product->id,
                     'quantity' => $item['qty'],
@@ -124,16 +128,19 @@ class RestockSeeder extends Seeder
                     'updated_at' => $dateBatch2,
                 ]);
 
-                StockMovement::create([
+                StockMovement::forceCreate([
                     'product_id' => $product->id,
                     'user_id' => $admin->id,
-                    'movement_type' => 'restock',
+                    'movement_type' => MovementType::Restock,
                     'quantity_change' => $item['qty'],
                     'reference_type' => Restock::class,
                     'reference_id' => $restock2->id,
                     'created_at' => $dateBatch2,
                     'updated_at' => $dateBatch2,
                 ]);
+
+                // Update kolom stok produk di tabel products
+                $product->increment('stock', $item['qty']);
             }
             $restock2->update(['total_cost' => $totalCost2]);
         });

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\DeliveryStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -26,6 +27,7 @@ class Delivery extends Model
             'scheduled_at' => 'datetime',
             'started_at' => 'datetime',
             'completed_at' => 'datetime',
+            'status' => DeliveryStatus::class,
         ];
     }
 

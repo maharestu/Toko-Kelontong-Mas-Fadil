@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('stock_movements', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->restrictOnDelete();
             $table->foreignId('user_id')->constrained('users')->restrictOnDelete();
             $table->enum('movement_type', ['restock', 'sale', 'adjustment']);
             $table->integer('quantity_change');

@@ -2,6 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Enums\DeliveryStatus;
+use App\Enums\MovementType;
+use App\Enums\OrderType;
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentType;
 use App\Models\Customer;
 use App\Models\Delivery;
 use App\Models\Payment;
@@ -58,21 +63,21 @@ class TransactionSeeder extends Seeder
                     ];
                 }
 
-                $sale = Sale::create([
+                $sale = Sale::forceCreate([
                     'user_id' => $kasir->id,
                     'customer_id' => $saleData['customer_id'] ?? null,
                     'customer_name' => $saleData['customer_name'] ?? null,
-                    'order_type' => $saleData['order_type'] ?? 'direct',
+                    'order_type' => $saleData['order_type'] ?? OrderType::Direct,
                     'total_amount' => $totalAmount,
-                    'payment_type' => $saleData['payment_type'] ?? 'cash',
+                    'payment_type' => $saleData['payment_type'] ?? PaymentType::Langsung,
                     'due_date' => $saleData['due_date'] ?? null,
                     'created_at' => $saleTime,
                     'updated_at' => $saleTime,
                 ]);
 
-                // Insert Details & Stock Movement Out
+                // Insert Details, Stock Movement Out, & Decrement Product Stock
                 foreach ($detailsToInsert as $item) {
-                    SaleDetail::create([
+                    SaleDetail::forceCreate([
                         'sale_id' => $sale->id,
                         'product_id' => $item['product']->id,
                         'quantity' => $item['qty'],
@@ -83,25 +88,28 @@ class TransactionSeeder extends Seeder
                         'updated_at' => $saleTime,
                     ]);
 
-                    StockMovement::create([
+                    StockMovement::forceCreate([
                         'product_id' => $item['product']->id,
                         'user_id' => $kasir->id,
-                        'movement_type' => 'sale',
+                        'movement_type' => MovementType::Sale,
                         'quantity_change' => -$item['qty'],
                         'reference_type' => Sale::class,
                         'reference_id' => $sale->id,
                         'created_at' => $saleTime,
                         'updated_at' => $saleTime,
                     ]);
+
+                    // Kurangi stok di tabel products
+                    $item['product']->decrement('stock', $item['qty']);
                 }
 
                 // Insert Delivery jika ada
                 if ($deliveryData) {
-                    Delivery::create([
+                    Delivery::forceCreate([
                         'sale_id' => $sale->id,
                         'delivery_address' => $deliveryData['address'],
                         'scheduled_at' => $deliveryData['scheduled_at'] ?? $saleTime,
-                        'status' => $deliveryData['status'] ?? 'pending',
+                        'status' => $deliveryData['status'] ?? DeliveryStatus::Menunggu,
                         'started_at' => $deliveryData['started_at'] ?? null,
                         'completed_at' => $deliveryData['completed_at'] ?? null,
                         'courier_id' => $deliveryData['courier_id'] ?? null,
@@ -112,11 +120,11 @@ class TransactionSeeder extends Seeder
 
                 // Insert Payment jika ada
                 if ($paymentData) {
-                    Payment::create([
+                    Payment::forceCreate([
                         'sale_id' => $sale->id,
                         'user_id' => $paymentData['user_id'] ?? $kasir->id,
                         'amount' => $paymentData['amount'] ?? $totalAmount,
-                        'payment_method' => $paymentData['payment_method'] ?? 'cash',
+                        'payment_method' => $paymentData['payment_method'] ?? PaymentMethod::Cash,
                         'paid_at' => $paymentData['paid_at'] ?? $saleTime,
                         'notes' => $paymentData['notes'] ?? null,
                         'created_at' => $paymentData['paid_at'] ?? $saleTime,
@@ -136,8 +144,8 @@ class TransactionSeeder extends Seeder
                 [
                     'customer_id' => null,
                     'customer_name' => 'Pak Joko (Walk-in)',
-                    'order_type' => 'direct',
-                    'payment_type' => 'cash',
+                    'order_type' => OrderType::Direct,
+                    'payment_type' => PaymentType::Langsung,
                     'created_at' => $time1,
                 ],
                 [
@@ -147,8 +155,7 @@ class TransactionSeeder extends Seeder
                 ],
                 null,
                 [
-                    'amount' => 129000,
-                    'payment_method' => 'cash',
+                    'payment_method' => PaymentMethod::Cash,
                     'paid_at' => $time1,
                     'notes' => 'Pembayaran lunas tunai di meja kasir',
                 ]
@@ -160,8 +167,8 @@ class TransactionSeeder extends Seeder
                 [
                     'customer_id' => $customers['Pak Slamet']->id ?? null,
                     'customer_name' => 'Pak Slamet',
-                    'order_type' => 'delivery',
-                    'payment_type' => 'cash',
+                    'order_type' => OrderType::Delivery,
+                    'payment_type' => PaymentType::Langsung,
                     'created_at' => $time2,
                 ],
                 [
@@ -172,14 +179,13 @@ class TransactionSeeder extends Seeder
                 [
                     'address' => 'Jl. Mawar No. 5',
                     'scheduled_at' => $time2,
-                    'status' => 'completed',
+                    'status' => DeliveryStatus::Selesai,
                     'started_at' => $time2->copy()->addMinutes(15),
                     'completed_at' => $time2->copy()->addMinutes(45),
                     'courier_id' => $kurir->id,
                 ],
                 [
-                    'amount' => 223000,
-                    'payment_method' => 'cash',
+                    'payment_method' => PaymentMethod::Cash,
                     'paid_at' => $time2->copy()->addMinutes(45),
                     'notes' => 'COD titip uang ke kurir Budi Santoso',
                 ]
@@ -191,8 +197,8 @@ class TransactionSeeder extends Seeder
                 [
                     'customer_id' => $customers['Ibu RT Endang']->id ?? null,
                     'customer_name' => 'Ibu RT Endang',
-                    'order_type' => 'direct',
-                    'payment_type' => 'credit',
+                    'order_type' => OrderType::Direct,
+                    'payment_type' => PaymentType::Kredit,
                     'due_date' => $time3->copy()->addDays(14)->toDateString(),
                     'created_at' => $time3,
                 ],
@@ -203,8 +209,7 @@ class TransactionSeeder extends Seeder
                 ],
                 null,
                 [
-                    'amount' => 133000,
-                    'payment_method' => 'cash',
+                    'payment_method' => PaymentMethod::Cash,
                     'paid_at' => $time3->copy()->addDays(3),
                     'notes' => 'Pelunasan kasbon sembako bulan lalu',
                 ]
@@ -219,8 +224,8 @@ class TransactionSeeder extends Seeder
             $createSaleWithItems(
                 [
                     'customer_name' => 'Mbak Maya',
-                    'order_type' => 'direct',
-                    'payment_type' => 'cash',
+                    'order_type' => OrderType::Direct,
+                    'payment_type' => PaymentType::Langsung,
                     'created_at' => $time4,
                 ],
                 [
@@ -230,7 +235,7 @@ class TransactionSeeder extends Seeder
                 ],
                 null,
                 [
-                    'payment_method' => 'qris',
+                    'payment_method' => PaymentMethod::Qris,
                     'paid_at' => $time4,
                     'notes' => 'Pembayaran via QRIS Kasir',
                 ]
@@ -242,8 +247,8 @@ class TransactionSeeder extends Seeder
                 [
                     'customer_id' => $customers['Mbak Dewi']->id ?? null,
                     'customer_name' => 'Mbak Dewi',
-                    'order_type' => 'direct',
-                    'payment_type' => 'credit',
+                    'order_type' => OrderType::Direct,
+                    'payment_type' => PaymentType::Kredit,
                     'due_date' => Carbon::now()->addDays(5)->toDateString(), // Jatuh tempo 5 hari lagi
                     'created_at' => $time5,
                 ],
@@ -262,8 +267,8 @@ class TransactionSeeder extends Seeder
                 [
                     'customer_id' => $customers['Warung Kopi Mas Yono']->id ?? null,
                     'customer_name' => 'Warung Kopi Mas Yono',
-                    'order_type' => 'direct',
-                    'payment_type' => 'credit',
+                    'order_type' => OrderType::Direct,
+                    'payment_type' => PaymentType::Kredit,
                     'due_date' => Carbon::now()->addDays(7)->toDateString(),
                     'created_at' => $time6,
                 ],
@@ -277,11 +282,11 @@ class TransactionSeeder extends Seeder
                 null
             );
             // Dicicil Rp 200.000 via Transfer kemarin (H-2)
-            Payment::create([
+            Payment::forceCreate([
                 'sale_id' => $sale6->id,
                 'user_id' => $kasir->id,
                 'amount' => 200000,
-                'payment_method' => 'transfer',
+                'payment_method' => PaymentMethod::Transfer,
                 'paid_at' => Carbon::now()->subDays(2)->setTime(15, 30),
                 'notes' => 'Angsuran 1 cicilan kasbon kulakan warkop (Transfer BCA)',
                 'created_at' => Carbon::now()->subDays(2)->setTime(15, 30),
@@ -293,8 +298,8 @@ class TransactionSeeder extends Seeder
                 [
                     'customer_id' => $customers['Pak Slamet']->id ?? null,
                     'customer_name' => 'Pak Slamet',
-                    'order_type' => 'delivery',
-                    'payment_type' => 'cash',
+                    'order_type' => OrderType::Delivery,
+                    'payment_type' => PaymentType::Langsung,
                     'created_at' => $time7,
                 ],
                 [
@@ -305,13 +310,13 @@ class TransactionSeeder extends Seeder
                 [
                     'address' => 'Jl. Mawar No. 5',
                     'scheduled_at' => $time7->copy()->addMinutes(30),
-                    'status' => 'completed',
+                    'status' => DeliveryStatus::Selesai,
                     'started_at' => $time7->copy()->addMinutes(30),
                     'completed_at' => $time7->copy()->addMinutes(50),
                     'courier_id' => $kurir->id,
                 ],
                 [
-                    'payment_method' => 'cash',
+                    'payment_method' => PaymentMethod::Cash,
                     'paid_at' => $time7->copy()->addMinutes(50),
                     'notes' => 'Lunas diterima kurir Budi Santoso',
                 ]
@@ -323,8 +328,8 @@ class TransactionSeeder extends Seeder
                 [
                     'customer_id' => $customers['Ibu RT Endang']->id ?? null,
                     'customer_name' => 'Ibu RT Endang',
-                    'order_type' => 'delivery',
-                    'payment_type' => 'cash',
+                    'order_type' => OrderType::Delivery,
+                    'payment_type' => PaymentType::Langsung,
                     'created_at' => $time8,
                 ],
                 [
@@ -335,7 +340,7 @@ class TransactionSeeder extends Seeder
                 [
                     'address' => 'Jl. Melati No. 12, RT 02/03',
                     'scheduled_at' => $time8,
-                    'status' => 'delivering',
+                    'status' => DeliveryStatus::Diantar,
                     'started_at' => $time8->copy()->addMinutes(20),
                     'completed_at' => null,
                     'courier_id' => $kurir->id,
@@ -348,8 +353,8 @@ class TransactionSeeder extends Seeder
             $createSaleWithItems(
                 [
                     'customer_name' => 'Ibu Halimah',
-                    'order_type' => 'direct',
-                    'payment_type' => 'cash',
+                    'order_type' => OrderType::Direct,
+                    'payment_type' => PaymentType::Langsung,
                     'created_at' => $time9,
                 ],
                 [
@@ -360,7 +365,7 @@ class TransactionSeeder extends Seeder
                 ],
                 null,
                 [
-                    'payment_method' => 'cash',
+                    'payment_method' => PaymentMethod::Cash,
                     'paid_at' => $time9,
                     'notes' => 'Transaksi tunai pagi hari',
                 ]
@@ -371,8 +376,8 @@ class TransactionSeeder extends Seeder
             $createSaleWithItems(
                 [
                     'customer_name' => 'Mas Doni',
-                    'order_type' => 'direct',
-                    'payment_type' => 'cash',
+                    'order_type' => OrderType::Direct,
+                    'payment_type' => PaymentType::Langsung,
                     'created_at' => $time10,
                 ],
                 [
@@ -382,7 +387,7 @@ class TransactionSeeder extends Seeder
                 ],
                 null,
                 [
-                    'payment_method' => 'cash',
+                    'payment_method' => PaymentMethod::Cash,
                     'paid_at' => $time10,
                     'notes' => 'Pembeli jajan siang',
                 ]
