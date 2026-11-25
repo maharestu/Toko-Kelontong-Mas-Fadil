@@ -24,7 +24,7 @@
             </a>
 
             <!-- Laporan -->
-            <a href="#" class="bg-white rounded-2xl p-4 border border-gray-100 shadow-[0_1px_4px_rgba(0,0,0,0.03)] flex flex-col justify-between min-h-[148px] hover:shadow-md hover:border-gray-200 transition-all group active:scale-[0.98]">
+            <a href="{{ route('laporan') }}" class="bg-white rounded-2xl p-4 border border-gray-100 shadow-[0_1px_4px_rgba(0,0,0,0.03)] flex flex-col justify-between min-h-[148px] hover:shadow-md hover:border-gray-200 transition-all group active:scale-[0.98]">
                 <div class="w-10 h-10 rounded-xl bg-[#eef5f0] text-[#1b4332] flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                     <!-- Bar Chart Icon -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -140,7 +140,30 @@
             </div>
         </div>
 
-        <!-- 3. Versi Aplikasi -->
+        <!-- 3. Keluar Akun -->
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="w-full bg-white rounded-2xl border border-rose-100 shadow-[0_1px_4px_rgba(0,0,0,0.03)] p-3.5 flex items-center justify-between hover:bg-rose-50/70 transition group cursor-pointer">
+                <div class="flex items-center gap-3 text-left">
+                    <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" x2="9" y1="12" y2="12"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-rose-700">Keluar Akun</h4>
+                        <p class="text-[11px] text-gray-400 mt-0.5">{{ Auth::user()?->name ?? 'Akun Aktif' }}</p>
+                    </div>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-rose-300 group-hover:text-rose-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"/>
+                </svg>
+            </button>
+        </form>
+
+        <!-- 4. Versi Aplikasi -->
         <div class="text-center pt-2 pb-4">
             <p class="text-xs text-gray-400 font-normal tracking-wide">WarungPOS v1.4.0</p>
         </div>

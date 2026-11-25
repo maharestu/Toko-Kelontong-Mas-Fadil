@@ -1,5 +1,5 @@
-<x-layouts.app title="Edit Produk - Toko Kelontong Mas Fadil" active="produk">
-    <div class="px-4 pt-4 pb-28">
+<x-app-layout title="Edit Produk - Toko Kelontong Mas Fadil" active="produk">
+    <div class="px-4 pt-4 pb-6">
         <!-- Top Navigation Bar (Kembali, Tanpa Toko Aktif) -->
         <div class="flex items-center justify-between mb-4">
             <a href="{{ route('products.index') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-gray-900 transition-colors">
@@ -278,5 +278,5 @@
         }
     </script>
     @endpush
-</x-layouts.app>
+</x-app-layout>
 

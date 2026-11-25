@@ -1,4 +1,4 @@
-<x-layouts.app title="Kelola Produk - Toko Kelontong Mas Fadil" active="produk">
+<x-app-layout title="Kelola Produk - Toko Kelontong Mas Fadil" active="produk">
     <div class="px-4 pt-5 pb-6">
         <!-- Header -->
         <div class="flex items-start justify-between gap-3 mb-4">
@@ -228,4 +228,4 @@
         }
     </script>
     @endpush
-</x-layouts.app>
+</x-app-layout>

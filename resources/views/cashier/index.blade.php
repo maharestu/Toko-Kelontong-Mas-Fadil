@@ -125,14 +125,6 @@
                 </div>
             </div>
 
-            <!-- Flash Message Sukses -->
-            @if(session('success') && !session('sale_receipt'))
-                <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center justify-between">
-                    <span>{{ session('success') }}</span>
-                    <span class="font-bold cursor-pointer text-emerald-600 hover:text-emerald-900" @click="$el.parentElement.remove()">&times;</span>
-                </div>
-            @endif
-
             <!-- 2. Search Bar -->
             <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">

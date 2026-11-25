@@ -37,14 +37,6 @@
             <p class="text-xs text-gray-500 mt-0.5">Riwayat pencatatan barang datang &amp; penambahan stok...</p>
         </div>
 
-        <!-- Notifikasi Sukses -->
-        @if(session('success'))
-            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center justify-between">
-                <span>{{ session('success') }}</span>
-                <span class="font-bold cursor-pointer text-emerald-600 hover:text-emerald-900" @click="$el.parentElement.remove()">&times;</span>
-            </div>
-        @endif
-
         <!-- 2. Tombol Utama: + Catat Restock -->
         <button type="button" @click="showCreateModal = true" class="w-full bg-[#0a2316] hover:bg-[#123624] text-white py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.99]">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">

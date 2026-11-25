@@ -1,4 +1,4 @@
-<x-layouts.app title="Kelola Kategori - Toko Kelontong Mas Fadil" active="kategori">
+<x-app-layout title="Kelola Kategori - Toko Kelontong Mas Fadil" active="kategori">
     <div class="px-4 pt-5 pb-6">
         <!-- Header -->
         <header class="mb-4">
@@ -235,4 +235,4 @@
         }
     </script>
     @endpush
-</x-layouts.app>
+</x-app-layout>

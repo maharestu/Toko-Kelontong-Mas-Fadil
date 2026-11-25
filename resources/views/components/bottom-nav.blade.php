@@ -1,76 +1,69 @@
 @props([
-    'active' => 'kategori',
+    'active' => null,
 ])
 
 @php
-    $navItems = [
-        [
-            'id' => 'home',
-            'label' => 'Home',
-            'url' => url('/'),
-            'icon' => 'home',
-        ],
-        [
-            'id' => 'produk',
-            'label' => 'Produk',
-            'url' => Route::has('products.index') ? route('products.index') : '#',
-            'icon' => 'box',
-        ],
-        [
-            'id' => 'kasir',
-            'label' => 'Kasir',
-            'url' => Route::has('cashier.index') ? route('cashier.index') : (Route::has('sales.index') ? route('sales.index') : '#'),
-            'icon' => 'register',
-        ],
-        [
-            'id' => 'kategori',
-            'label' => 'Kategori',
-            'url' => route('categories.index'),
-            'icon' => 'store',
-        ],
-        [
-            'id' => 'lainnya',
-            'label' => 'Lainnya',
-            'url' => route('lainnya'),
-            'icon' => 'grid',
-        ],
-    ];
+    $isHome = $active ? $active === 'home' : request()->routeIs('dashboard');
+    $isProduk = $active ? $active === 'produk' : request()->routeIs('products.*');
+    $isKasir = $active ? $active === 'kasir' : (request()->routeIs('cashier.*') || request()->routeIs('sales.*'));
+    $isKategori = $active ? $active === 'kategori' : request()->routeIs('categories.*');
+    $isLainnya = $active
+        ? $active === 'lainnya'
+        : (request()->routeIs('lainnya') || request()->routeIs('restocks.*') || request()->routeIs('laporan*') || request()->routeIs('profile.*'));
 @endphp
 
-<nav class="fixed bottom-0 left-0 right-0 z-40">
-    <div class="max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-lg px-2 py-2 flex items-center justify-around">
-        @foreach ($navItems as $item)
-            @php
-                $isActive = ($active === $item['id']);
-            @endphp
-            <a href="{{ $item['url'] }}" 
-               class="flex flex-col items-center justify-center flex-1 py-1 px-1 transition-colors {{ $isActive ? 'text-[#133c30] font-bold' : 'text-gray-400 hover:text-gray-600 font-medium' }}">
-                <div class="w-6 h-6 flex items-center justify-center mb-0.5">
-                    @if ($item['icon'] === 'home')
-                        <svg class="w-5 h-5 {{ $isActive ? 'stroke-[#133c30] stroke-[2.2]' : 'stroke-gray-400 stroke-[1.8]' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                        </svg>
-                    @elseif ($item['icon'] === 'box')
-                        <svg class="w-5 h-5 {{ $isActive ? 'stroke-[#133c30] stroke-[2.2]' : 'stroke-gray-400 stroke-[1.8]' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg>
-                    @elseif ($item['icon'] === 'register')
-                        <svg class="w-5 h-5 {{ $isActive ? 'stroke-[#133c30] stroke-[2.2]' : 'stroke-gray-400 stroke-[1.8]' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                    @elseif ($item['icon'] === 'store')
-                        <svg class="w-5 h-5 {{ $isActive ? 'stroke-[#133c30] stroke-[2.2]' : 'stroke-gray-400 stroke-[1.8]' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
-                    @else
-                        <svg class="w-5 h-5 {{ $isActive ? 'stroke-[#133c30] stroke-[2.2]' : 'stroke-gray-400 stroke-[1.8]' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                        </svg>
-                    @endif
-                </div>
-                <span class="text-[11px] leading-tight">{{ $item['label'] }}</span>
+<!-- Bottom Navigation Bar (Fixed at Viewport Bottom, Aligned to 500px Container) -->
+<nav aria-label="Navigasi Utama" class="fixed bottom-0 left-0 right-0 z-40 pointer-events-none">
+    <div class="pointer-events-auto max-w-[500px] mx-auto bg-white/95 backdrop-blur-md border-t border-x border-gray-100 px-3 py-2.5 sm:rounded-t-2xl shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.06)]">
+        <div class="grid grid-cols-5 items-center justify-items-center">
+            <!-- Home -->
+            <a href="{{ route('dashboard') }}" class="flex flex-col items-center gap-1 {{ $isHome ? 'text-[#173628]' : 'text-gray-400 hover:text-gray-700 transition' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $isHome ? '2.2' : '2' }}" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <span class="text-[10px] {{ $isHome ? 'font-semibold text-[#173628]' : 'font-medium' }} tracking-tight">Home</span>
             </a>
-        @endforeach
+
+            <!-- Produk -->
+            <a href="{{ route('products.index') }}" class="flex flex-col items-center gap-1 {{ $isProduk ? 'text-[#173628]' : 'text-gray-400 hover:text-gray-700 transition' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $isProduk ? '2.2' : '2' }}" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="20" height="14" x="2" y="7" rx="2" ry="2"/>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                </svg>
+                <span class="text-[10px] {{ $isProduk ? 'font-semibold text-[#173628]' : 'font-medium' }} tracking-tight">Produk</span>
+            </a>
+
+            <!-- Kasir -->
+            <a href="{{ route('cashier.index') }}" class="flex flex-col items-center gap-1 {{ $isKasir ? 'text-[#173628]' : 'text-gray-400 hover:text-gray-700 transition' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $isKasir ? '2.2' : '2' }}" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="18" x="3" y="3" rx="2"/>
+                    <path d="M3 9h18"/>
+                    <path d="M9 21V9"/>
+                </svg>
+                <span class="text-[10px] {{ $isKasir ? 'font-semibold text-[#173628]' : 'font-medium' }} tracking-tight">Kasir</span>
+            </a>
+
+            <!-- Kategori -->
+            <a href="{{ route('categories.index') }}" class="flex flex-col items-center gap-1 {{ $isKategori ? 'text-[#173628]' : 'text-gray-400 hover:text-gray-700 transition' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $isKategori ? '2.2' : '2' }}" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="7" height="7" x="3" y="3" rx="1"/>
+                    <rect width="7" height="7" x="14" y="3" rx="1"/>
+                    <rect width="7" height="7" x="14" y="14" rx="1"/>
+                    <rect width="7" height="7" x="3" y="14" rx="1"/>
+                </svg>
+                <span class="text-[10px] {{ $isKategori ? 'font-semibold text-[#173628]' : 'font-medium' }} tracking-tight">Kategori</span>
+            </a>
+
+            <!-- Lainnya -->
+            <a href="{{ route('lainnya') }}" class="flex flex-col items-center gap-1 {{ $isLainnya ? 'text-[#173628]' : 'text-gray-400 hover:text-gray-700 transition' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $isLainnya ? '2.2' : '2' }}" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="1"/>
+                    <circle cx="19" cy="12" r="1"/>
+                    <circle cx="5" cy="12" r="1"/>
+                </svg>
+                <span class="text-[10px] {{ $isLainnya ? 'font-semibold text-[#173628]' : 'font-medium' }} tracking-tight">Lainnya</span>
+            </a>
+        </div>
     </div>
 </nav>
-
