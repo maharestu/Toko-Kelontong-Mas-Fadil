@@ -148,8 +148,8 @@
     </div>
 
     <!-- Modal Edit Kategori -->
-    <x-modal id="modal-edit-category" maxWidth="sm">
-        <form id="form-edit-category" method="POST" action="">
+    <x-modal name="modal-edit-category" maxWidth="sm">
+        <form id="form-edit-category" method="POST" action="" class="p-6">
             @csrf
             @method('PUT')
             <h3 class="text-xl font-bold text-gray-900 mb-4">Edit Kategori</h3>
@@ -171,7 +171,7 @@
             <div class="mt-6 flex items-center justify-end gap-2.5">
                 <button 
                     type="button" 
-                    onclick="closeModal('modal-edit-category')"
+                    x-on:click="$dispatch('close')"
                     class="py-2.5 px-4 border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-colors cursor-pointer"
                 >
                     Batal
@@ -187,8 +187,8 @@
     </x-modal>
 
     <!-- Modal Konfirmasi Hapus -->
-    <x-modal id="modal-delete-category" maxWidth="sm">
-        <form id="form-delete-category" method="POST" action="">
+    <x-modal name="modal-delete-category" maxWidth="sm">
+        <form id="form-delete-category" method="POST" action="" class="p-6">
             @csrf
             @method('DELETE')
             <div class="py-1">
@@ -199,7 +199,7 @@
                 <div class="flex items-center gap-3 w-full">
                     <button 
                         type="button" 
-                        onclick="closeModal('modal-delete-category')" 
+                        x-on:click="$dispatch('close')" 
                         class="flex-1 py-3 px-4 border border-gray-300 rounded-2xl text-sm font-semibold text-gray-800 bg-white hover:bg-gray-50 transition-colors text-center cursor-pointer"
                     >
                         Batal
@@ -217,40 +217,12 @@
 
     @push('scripts')
     <script>
-        function openModal(id) {
-            const modal = document.getElementById(id);
-            if (!modal) return;
-            const content = document.getElementById(id + '-content');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                if (content) {
-                    content.classList.remove('scale-95');
-                    content.classList.add('scale-100');
-                }
-            }, 10);
-        }
-
-        function closeModal(id) {
-            const modal = document.getElementById(id);
-            if (!modal) return;
-            const content = document.getElementById(id + '-content');
-            modal.classList.add('opacity-0');
-            if (content) {
-                content.classList.remove('scale-100');
-                content.classList.add('scale-95');
-            }
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 200);
-        }
-
         function openEditModal(id, name) {
             const form = document.getElementById('form-edit-category');
             const input = document.getElementById('edit_category_name');
             form.action = `/categories/${id}`;
             input.value = name;
-            openModal('modal-edit-category');
+            window.dispatchEvent(new CustomEvent('open-modal', { detail: 'modal-edit-category' }));
             setTimeout(() => input.focus(), 150);
         }
 
@@ -259,7 +231,7 @@
             const label = document.getElementById('delete_category_name');
             form.action = `/categories/${id}`;
             label.textContent = `“${name}”`;
-            openModal('modal-delete-category');
+            window.dispatchEvent(new CustomEvent('open-modal', { detail: 'modal-delete-category' }));
         }
     </script>
     @endpush

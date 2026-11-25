@@ -189,8 +189,8 @@
     </div>
 
     <!-- Modal Konfirmasi Hapus Produk (Presisi Sesuai Desain Figma) -->
-    <x-modal id="modal-delete-product" maxWidth="sm">
-        <form id="form-delete-product" method="POST" action="">
+    <x-modal name="modal-delete-product" maxWidth="sm">
+        <form id="form-delete-product" method="POST" action="" class="p-6">
             @csrf
             @method('DELETE')
             <div class="py-1">
@@ -201,7 +201,7 @@
                 <div class="flex items-center gap-3 w-full">
                     <button 
                         type="button" 
-                        onclick="closeModal('modal-delete-product')" 
+                        x-on:click="$dispatch('close')" 
                         class="flex-1 py-3 px-4 border border-gray-300 rounded-2xl text-sm font-semibold text-gray-800 bg-white hover:bg-gray-50 transition-colors text-center cursor-pointer"
                     >
                         Batal
@@ -219,40 +219,12 @@
 
     @push('scripts')
     <script>
-        function openModal(id) {
-            const modal = document.getElementById(id);
-            if (!modal) return;
-            const content = document.getElementById(id + '-content');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                if (content) {
-                    content.classList.remove('scale-95');
-                    content.classList.add('scale-100');
-                }
-            }, 10);
-        }
-
-        function closeModal(id) {
-            const modal = document.getElementById(id);
-            if (!modal) return;
-            const content = document.getElementById(id + '-content');
-            modal.classList.add('opacity-0');
-            if (content) {
-                content.classList.remove('scale-100');
-                content.classList.add('scale-95');
-            }
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 200);
-        }
-
         function openDeleteProductModal(id, name) {
             const form = document.getElementById('form-delete-product');
             const label = document.getElementById('delete_product_name');
             form.action = `/products/${id}`;
             label.textContent = `“${name}”`;
-            openModal('modal-delete-product');
+            window.dispatchEvent(new CustomEvent('open-modal', { detail: 'modal-delete-product' }));
         }
     </script>
     @endpush
