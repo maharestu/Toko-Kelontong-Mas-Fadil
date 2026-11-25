@@ -2,7 +2,7 @@
     <div class="px-4 pt-5 pb-6">
         <!-- Header -->
         <div class="flex items-start justify-between gap-3 mb-4">
-            <div>
+            <div class="min-w-0">
                 <h1 class="text-2xl font-bold tracking-tight text-gray-900">Kelola Produk</h1>
                 <p class="text-xs text-gray-500 font-medium mt-0.5 flex items-center gap-1.5">
                     <span>{{ $totalProductsCount }} total produk</span>
@@ -17,15 +17,29 @@
                     @endif
                 </p>
             </div>
-            <a 
-                href="{{ route('products.create') }}" 
-                class="bg-[#133c30] hover:bg-[#0e2a22] active:scale-[0.98] text-white text-xs font-semibold px-3.5 py-2.5 rounded-xl inline-flex items-center gap-1.5 shadow-xs transition-all shrink-0 cursor-pointer"
-            >
-                <svg class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                </svg>
-                <span>Produk</span>
-            </a>
+            <div class="flex items-center gap-2 shrink-0">
+                <a 
+                    href="{{ route('categories.index') }}" 
+                    class="bg-white hover:bg-gray-50 active:scale-[0.98] text-gray-700 border border-gray-200 text-xs font-semibold px-3 py-2.5 rounded-xl inline-flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                >
+                    <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <rect width="7" height="7" x="3" y="3" rx="1"/>
+                        <rect width="7" height="7" x="14" y="3" rx="1"/>
+                        <rect width="7" height="7" x="14" y="14" rx="1"/>
+                        <rect width="7" height="7" x="3" y="14" rx="1"/>
+                    </svg>
+                    <span>Kategori</span>
+                </a>
+                <a 
+                    href="{{ route('products.create') }}" 
+                    class="bg-[#133c30] hover:bg-[#0e2a22] active:scale-[0.98] text-white text-xs font-semibold px-3.5 py-2.5 rounded-xl inline-flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                >
+                    <svg class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Produk</span>
+                </a>
+            </div>
         </div>
 
         <!-- Bar Pencarian & Dropdown Filter Stok -->

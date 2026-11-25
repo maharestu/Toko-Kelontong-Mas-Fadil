@@ -3,17 +3,12 @@
         <!-- 1. Header Profil & Toko -->
         <div class="flex items-center justify-between pt-1">
             <div class="flex items-center gap-2.5">
-                <div class="w-10 h-10 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 font-semibold text-xs overflow-hidden flex-shrink-0">
-                    <span class="text-[11px] font-medium text-gray-500">img</span>
+                <div class="w-10 h-10 rounded-xl bg-[#14281f] text-white flex items-center justify-center font-bold text-sm tracking-wider shadow-sm flex-shrink-0">
+                    MA
                 </div>
                 <div>
-                    <div class="flex items-center gap-1.5">
-                        <h2 class="text-sm font-bold text-gray-900 leading-tight">Toko Mas Adil</h2>
-                        <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 uppercase tracking-wide">
-                            BUKA
-                        </span>
-                    </div>
-                    <p class="text-[11px] text-gray-400 font-normal">Ringkasan</p>
+                    <h2 class="text-sm font-bold text-gray-900 leading-tight">Toko Mas Adil</h2>
+                    <p class="text-[11px] text-gray-400 font-normal">{{ ucfirst(Auth::user()?->role instanceof \App\Enums\UserRole ? Auth::user()->role->value : (Auth::user()?->role ?? 'Admin')) }}</p>
                 </div>
             </div>
 
@@ -38,9 +33,8 @@
         </div>
 
         <!-- 2. Shift & Tanggal Info Bar -->
-        <div class="flex items-center justify-between text-[11px] text-gray-500 px-0.5">
+        <div class="text-[11px] text-gray-500 px-0.5">
             <span>{{ $currentDateFormatted }} &bull; {{ $shiftName }} ({{ Auth::user()?->name ?? 'Mas Adil' }})</span>
-            <span class="w-2 h-2 rounded-full bg-emerald-500 ring-4 ring-emerald-100 flex-shrink-0 animate-pulse"></span>
         </div>
 
         <!-- 3. Hero Card: Penjualan Hari Ini -->

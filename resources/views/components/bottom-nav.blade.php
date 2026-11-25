@@ -4,9 +4,9 @@
 
 @php
     $isHome = $active ? $active === 'home' : request()->routeIs('dashboard');
-    $isProduk = $active ? $active === 'produk' : request()->routeIs('products.*');
+    $isProduk = $active ? $active === 'produk' : (request()->routeIs('products.*') || request()->routeIs('categories.*'));
     $isKasir = $active ? $active === 'kasir' : (request()->routeIs('cashier.*') || request()->routeIs('sales.*'));
-    $isKategori = $active ? $active === 'kategori' : request()->routeIs('categories.*');
+    $isPoster = $active ? $active === 'poster' : false;
     $isLainnya = $active
         ? $active === 'lainnya'
         : (request()->routeIs('lainnya') || request()->routeIs('restocks.*') || request()->routeIs('laporan*') || request()->routeIs('profile.*'));
@@ -44,15 +44,14 @@
                 <span class="text-[10px] {{ $isKasir ? 'font-semibold text-[#173628]' : 'font-medium' }} tracking-tight">Kasir</span>
             </a>
 
-            <!-- Kategori -->
-            <a href="{{ route('categories.index') }}" class="flex flex-col items-center gap-1 {{ $isKategori ? 'text-[#173628]' : 'text-gray-400 hover:text-gray-700 transition' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $isKategori ? '2.2' : '2' }}" stroke-linecap="round" stroke-linejoin="round">
-                    <rect width="7" height="7" x="3" y="3" rx="1"/>
-                    <rect width="7" height="7" x="14" y="3" rx="1"/>
-                    <rect width="7" height="7" x="14" y="14" rx="1"/>
-                    <rect width="7" height="7" x="3" y="14" rx="1"/>
+            <!-- Poster -->
+            <a href="#" class="flex flex-col items-center gap-1 {{ $isPoster ? 'text-[#173628]' : 'text-gray-400 hover:text-gray-700 transition' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $isPoster ? '2.2' : '2' }}" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                    <circle cx="9" cy="9" r="2"/>
+                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
                 </svg>
-                <span class="text-[10px] {{ $isKategori ? 'font-semibold text-[#173628]' : 'font-medium' }} tracking-tight">Kategori</span>
+                <span class="text-[10px] {{ $isPoster ? 'font-semibold text-[#173628]' : 'font-medium' }} tracking-tight">Poster</span>
             </a>
 
             <!-- Lainnya -->

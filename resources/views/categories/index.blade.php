@@ -1,5 +1,15 @@
-<x-app-layout title="Kelola Kategori - Toko Kelontong Mas Fadil" active="kategori">
-    <div class="px-4 pt-5 pb-6">
+<x-app-layout title="Kelola Kategori - Toko Kelontong Mas Fadil" active="produk">
+    <div class="px-4 pt-4 pb-6">
+        <!-- Back to Products -->
+        <div class="flex items-center justify-between mb-3">
+            <a href="{{ route('products.index') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-gray-900 transition-colors">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                </svg>
+                <span>Kembali ke Produk</span>
+            </a>
+        </div>
+
         <!-- Header -->
         <header class="mb-4">
             <h1 class="text-2xl font-bold tracking-tight text-gray-900">Kelola Kategori</h1>
