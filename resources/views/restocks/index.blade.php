@@ -1,14 +1,38 @@
 <x-app-layout>
+    @php
+        // Siapkan data riwayat restock dari database untuk Alpine.js
+        $mergedList = collect();
+
+        if ($restocks && $restocks->count() > 0) {
+            foreach ($restocks as $r) {
+                $detailsSummary = $r->restockDetails->map(fn($d) => $d->product?->name ?? 'Produk')->take(3)->implode(', ');
+                if ($r->restockDetails->count() > 3) {
+                    $detailsSummary .= ' +' . ($r->restockDetails->count() - 3) . ' produk lainnya';
+                }
+                $datePart = \Carbon\Carbon::parse($r->restock_date)->translatedFormat('d M Y');
+                $timePart = $r->created_at ? $r->created_at->format('H:i') . ' WIB' : '';
+
+                $mergedList->push([
+                    'id' => $r->id,
+                    'code' => '#RST-' . date('Y', strtotime($r->restock_date)) . '-' . str_pad($r->id, 3, '0', STR_PAD_LEFT),
+                    'time' => trim($datePart . ($timePart !== '' ? ', ' . $timePart : '')),
+                    'raw_date' => \Carbon\Carbon::parse($r->restock_date)->format('Y-m-d'),
+                    'total_cost' => (float) $r->total_cost,
+                    'summary' => !empty($detailsSummary) ? $detailsSummary : ($r->notes ?? 'Pencatatan barang masuk'),
+                    'author' => $r->user?->name ?? 'Mas Adil',
+                    'notes' => $r->notes ?? '',
+                    'url' => route('restocks.show', $r->id),
+                ]);
+            }
+        }
+    @endphp
+
     <div x-data="{
         showCreateModal: false,
-        showDetailModal: false,
         searchQuery: '',
         activeFilter: 'all',
-        selectedRestock: null,
-        openDetail(item) {
-            this.selectedRestock = item;
-            this.showDetailModal = true;
-        },
+        customDate: '',
+        allRestocks: {{ Js::from($mergedList) }},
         items: [
             { product_id: '{{ $products->first()?->id ?? 1 }}', quantity: 10, purchase_price: 15000, selling_price: 18000 }
         ],
@@ -22,6 +46,55 @@
         },
         calculateTotal() {
             return this.items.reduce((sum, item) => sum + ((parseFloat(item.quantity) || 0) * (parseFloat(item.purchase_price) || 0)), 0);
+        },
+        matchesItem(item) {
+            const q = this.searchQuery.toLowerCase().trim();
+            if (q) {
+                const inCode = item.code && item.code.toLowerCase().includes(q);
+                const inNotes = item.notes && item.notes.toLowerCase().includes(q);
+                const inAuthor = item.author && item.author.toLowerCase().includes(q);
+                const inSummary = item.summary && item.summary.toLowerCase().includes(q);
+                if (!inCode && !inNotes && !inAuthor && !inSummary) {
+                    return false;
+                }
+            }
+
+            if (this.activeFilter === 'all') {
+                return true;
+            }
+
+            if (!item.raw_date) return false;
+
+            const today = new Date();
+            const target = new Date(item.raw_date + 'T00:00:00');
+
+            if (this.activeFilter === 'month') {
+                return target.getFullYear() === today.getFullYear() && target.getMonth() === today.getMonth();
+            }
+
+            if (this.activeFilter === 'week') {
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(today.getDate() - 7);
+                sevenDaysAgo.setHours(0, 0, 0, 0);
+                return target >= sevenDaysAgo && target <= new Date(today.getTime() + 86400000);
+            }
+
+            if (this.activeFilter === 'custom' && this.customDate) {
+                return item.raw_date === this.customDate;
+            }
+
+            return true;
+        },
+        get filteredRestocks() {
+            return this.allRestocks.filter(item => this.matchesItem(item));
+        },
+        formatDate(d) {
+            if (!d) return '';
+            const parts = d.split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}/${parts[1]}`;
+            }
+            return d;
         }
     }" class="p-4 sm:p-5 space-y-4">
 
@@ -41,7 +114,7 @@
 
         <!-- 2. Tombol Utama: + Catat Restock -->
         <button type="button" @click="showCreateModal = true"
-            class="w-full bg-[#0a2316] hover:bg-[#123624] text-white py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.99]">
+            class="w-full bg-[#0a2316] hover:bg-[#123624] text-white py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.99] cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10" />
@@ -51,7 +124,7 @@
             <span>+ Catat Restock</span>
         </button>
 
-        <!-- 3. Highlight Card: Bulan Ini (Total Kulakan) -->
+        <!-- 3. Highlight Card: Bulan Ini (Total Harga) -->
         <div class="bg-[#123b28] text-white rounded-2xl p-4 shadow-[0_2px_10px_rgba(18,59,40,0.15)] space-y-3.5">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-1.5 text-emerald-100 text-[11px] font-bold tracking-wider">
@@ -82,108 +155,92 @@
             <!-- Search Input -->
             <div class="relative">
                 <svg xmlns="http://www.w3.org/2000/svg"
-                    class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24"
+                    class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24"
                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="11" cy="11" r="8" />
                     <path d="m21 21-4.3-4.3" />
                 </svg>
                 <input type="text" x-model="searchQuery" placeholder="Cari no. restock, catatan, atau admin..."
-                    class="w-full bg-white border border-gray-200/90 rounded-xl pl-10 pr-4 py-2.5 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#123b28] focus:border-[#123b28] shadow-[0_1px_2px_rgba(0,0,0,0.02)] transition">
+                    class="w-full bg-white border border-gray-200/90 rounded-xl pl-10 pr-9 py-2.5 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#123b28] focus:border-[#123b28] shadow-[0_1px_2px_rgba(0,0,0,0.02)] transition">
+                <button type="button" x-show="searchQuery" @click="searchQuery = ''"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition p-0.5 cursor-pointer"
+                    title="Hapus pencarian">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
 
             <!-- Filter Chips (Horizontal Scroll) -->
             <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-                <button type="button" @click="activeFilter = 'all'"
-                    :class="activeFilter === 'all' ? 'bg-[#0a2316] text-white font-bold' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 font-medium'"
-                    class="text-[11px] px-3.5 py-1.5 rounded-lg flex-shrink-0 transition">
+                <button type="button" @click="activeFilter = 'all'; customDate = '';"
+                    :class="activeFilter === 'all' ? 'bg-[#0a2316] text-white font-bold shadow-xs' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 font-medium'"
+                    class="text-[11px] px-3.5 py-1.5 rounded-lg flex-shrink-0 transition cursor-pointer">
                     Semua Tanggal
                 </button>
-                <button type="button" @click="activeFilter = 'month'"
-                    :class="activeFilter === 'month' ? 'bg-[#0a2316] text-white font-bold' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 font-medium'"
-                    class="text-[11px] px-3.5 py-1.5 rounded-lg flex-shrink-0 transition">
+                <button type="button" @click="activeFilter = 'month'; customDate = '';"
+                    :class="activeFilter === 'month' ? 'bg-[#0a2316] text-white font-bold shadow-xs' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 font-medium'"
+                    class="text-[11px] px-3.5 py-1.5 rounded-lg flex-shrink-0 transition cursor-pointer">
                     Bulan Ini ({{ \Carbon\Carbon::now()->translatedFormat('M') }})
                 </button>
-                <button type="button" @click="activeFilter = 'week'"
-                    :class="activeFilter === 'week' ? 'bg-[#0a2316] text-white font-bold' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 font-medium'"
-                    class="text-[11px] px-3.5 py-1.5 rounded-lg flex-shrink-0 transition">
+                <button type="button" @click="activeFilter = 'week'; customDate = '';"
+                    :class="activeFilter === 'week' ? 'bg-[#0a2316] text-white font-bold shadow-xs' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 font-medium'"
+                    class="text-[11px] px-3.5 py-1.5 rounded-lg flex-shrink-0 transition cursor-pointer">
                     7 Hari Terakhir
                 </button>
-                <button type="button"
-                    class="bg-gray-100 hover:bg-gray-200 text-gray-600 p-1.5 rounded-lg flex-shrink-0 transition"
-                    title="Pilih Tanggal">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-                        <line x1="16" x2="16" y1="2" y2="6" />
-                        <line x1="8" x2="8" y1="2" y2="6" />
-                        <line x1="3" x2="21" y1="10" y2="10" />
-                    </svg>
-                </button>
+
+                <!-- Tombol Pilih Tanggal (Kalender) -->
+                <div class="relative flex-shrink-0">
+                    <button type="button"
+                        @click="$refs.datePicker.showPicker ? $refs.datePicker.showPicker() : $refs.datePicker.click()"
+                        :class="activeFilter === 'custom' ? 'bg-[#0a2316] text-white font-bold shadow-xs' : 'bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium'"
+                        class="p-1.5 px-2 rounded-lg transition cursor-pointer flex items-center gap-1 text-[11px]"
+                        title="Pilih Tanggal Tertentu">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                            <line x1="16" x2="16" y1="2" y2="6" />
+                            <line x1="8" x2="8" y1="2" y2="6" />
+                            <line x1="3" x2="21" y1="10" y2="10" />
+                        </svg>
+                        <span x-show="activeFilter === 'custom' && customDate" x-text="formatDate(customDate)" class="text-[10px]"></span>
+                    </button>
+                    <input type="date" x-ref="datePicker" x-model="customDate"
+                        @change="if (customDate) activeFilter = 'custom';"
+                        class="absolute inset-0 opacity-0 w-0 h-0 pointer-events-none">
+                </div>
             </div>
         </div>
 
         <!-- 5. List Riwayat Transaksi Barang Masuk -->
         <div class="space-y-3 pt-1">
-            @php
-                // Tampilkan data riwayat restock asli dari database
-                $mergedList = collect();
-
-                if ($restocks && $restocks->count() > 0) {
-                    foreach ($restocks as $r) {
-                        $detailsSummary = $r->restockDetails->map(fn($d) => $d->product?->name ?? 'Produk')->take(3)->implode(', ');
-                        if ($r->restockDetails->count() > 3) {
-                            $detailsSummary .= ' +' . ($r->restockDetails->count() - 3) . ' produk lainnya';
-                        }
-                        $datePart = \Carbon\Carbon::parse($r->restock_date)->translatedFormat('d M Y');
-                        $timePart = $r->created_at ? $r->created_at->format('H:i') . ' WIB' : '';
-
-                        $mergedList->push([
-                            'id' => $r->id,
-                            'code' => '#RST-' . date('Y', strtotime($r->restock_date)) . '-' . str_pad($r->id, 3, '0', STR_PAD_LEFT),
-                            'time' => trim($datePart . ($timePart !== '' ? ', ' . $timePart : '')),
-                            'total_cost' => (float) $r->total_cost,
-                            'summary' => !empty($detailsSummary) ? $detailsSummary : ($r->notes ?? 'Pencatatan barang masuk'),
-                            'author' => $r->user?->name ?? 'Mas Adil',
-                            'notes' => $r->notes,
-                            'details' => $r->restockDetails->map(fn($d) => [
-                                'name' => $d->product?->name ?? 'Produk',
-                                'qty' => $d->quantity,
-                                'buy' => (float) $d->purchase_price,
-                                'sell' => (float) $d->selling_price,
-                            ])->toArray()
-                        ]);
-                    }
-                }
-            @endphp
-
-            @forelse($mergedList as $item)
+            <template x-for="item in filteredRestocks" :key="item.id">
                 <div
                     class="bg-white rounded-2xl p-4 border border-gray-100 shadow-[0_1px_4px_rgba(0,0,0,0.03)] space-y-2 hover:border-gray-200 transition">
                     <!-- Header Kode & Waktu -->
                     <div class="flex items-center justify-between">
                         <span
-                            class="font-extrabold text-xs text-gray-900 tracking-tight font-mono">{{ $item['code'] }}</span>
-                        <span class="text-[11px] text-gray-400 font-normal">{{ $item['time'] }}</span>
+                            class="font-extrabold text-xs text-gray-900 tracking-tight font-mono"
+                            x-text="item.code"></span>
+                        <span class="text-[11px] text-gray-400 font-normal" x-text="item.time"></span>
                     </div>
 
-                    <!-- Nominal Kulakan -->
+                    <!-- Nominal Total Harga -->
                     <div>
                         <span class="text-[10px] text-gray-400 block font-normal">Total Harga</span>
-                        <span class="text-xl font-black text-gray-900 tracking-tight font-mono">
-                            Rp {{ number_format($item['total_cost'], 0, ',', '.') }}
+                        <span class="text-xl font-black text-gray-900 tracking-tight font-mono"
+                            x-text="'Rp ' + Number(item.total_cost).toLocaleString('id-ID')">
                         </span>
                     </div>
 
                     <!-- Ringkasan Produk -->
-                    <p class="text-xs text-gray-600 line-clamp-2 leading-relaxed pt-0.5">
-                        {{ $item['summary'] }}
-                    </p>
+                    <p class="text-xs text-gray-600 line-clamp-2 leading-relaxed pt-0.5" x-text="item.summary"></p>
 
                     <!-- Footer: Admin Pembuat & Link Detail -->
                     <div class="flex items-center justify-between pt-2 border-t border-gray-50 text-[11px]">
-                        <span class="text-gray-400">Oleh: {{ $item['author'] }}</span>
-                        <a href="{{ route('restocks.show', $item['id']) }}"
-                            class="font-bold text-[#123b28] hover:text-black flex items-center gap-0.5 transition">
+                        <span class="text-gray-400" x-text="'Oleh: ' + item.author"></span>
+                        <a :href="item.url"
+                            class="font-bold text-[#123b28] hover:text-black flex items-center gap-0.5 transition cursor-pointer">
                             <span>Lihat Detail</span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -192,13 +249,30 @@
                         </a>
                     </div>
                 </div>
-            @empty
-                <div class="bg-white rounded-2xl p-8 border border-gray-100 text-center space-y-1">
-                    <p class="text-sm font-bold text-gray-700">Belum ada riwayat restock</p>
-                    <p class="text-xs text-gray-400">Klik tombol "+ Catat Restock" di atas untuk menambahkan barang masuk.
-                    </p>
+            </template>
+
+            <!-- Empty State: Belum ada data di database -->
+            <div x-show="allRestocks.length === 0" class="bg-white rounded-2xl p-8 border border-gray-100 text-center space-y-1">
+                <p class="text-sm font-bold text-gray-700">Belum ada riwayat restock</p>
+                <p class="text-xs text-gray-400">Klik tombol "+ Catat Restock" di atas untuk menambahkan barang masuk.</p>
+            </div>
+
+            <!-- Empty State: Hasil Pencarian / Filter Tidak Ditemukan -->
+            <div x-show="allRestocks.length > 0 && filteredRestocks.length === 0"
+                class="bg-white rounded-2xl p-8 border border-gray-100 text-center space-y-2">
+                <div class="w-10 h-10 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mx-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <circle cx="11" cy="11" r="8" stroke-width="2" />
+                        <path d="m21 21-4.3-4.3" stroke-width="2" stroke-linecap="round" />
+                    </svg>
                 </div>
-            @endforelse
+                <p class="text-sm font-bold text-gray-800">Tidak ada riwayat restock yang cocok</p>
+                <p class="text-xs text-gray-400">Coba ubah kata kunci pencarian atau ganti filter tanggal.</p>
+                <button type="button" @click="searchQuery = ''; activeFilter = 'all'; customDate = '';"
+                    class="mt-2 inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition cursor-pointer">
+                    <span>Reset Filter</span>
+                </button>
+            </div>
         </div>
 
         <!-- 6. MODAL: Catat Restock Baru -->
@@ -313,62 +387,6 @@
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
-
-        <!-- 7. MODAL: Lihat Detail Restock -->
-        <div x-show="showDetailModal" x-cloak
-            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <div @click.away="showDetailModal = false"
-                class="bg-white w-full max-w-[420px] rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
-                <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                    <div>
-                        <h3 class="font-extrabold text-sm text-gray-900 font-mono" x-text="selectedRestock?.code"></h3>
-                        <p class="text-[11px] text-gray-400"
-                            x-text="selectedRestock?.time + ' • Oleh ' + selectedRestock?.author"></p>
-                    </div>
-                    <button type="button" @click="showDetailModal = false"
-                        class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1">&times;</button>
-                </div>
-
-                <div class="p-5 space-y-3.5 text-xs">
-                    <div>
-                        <span class="text-[10px] text-gray-400 block">Catatan / Supplier</span>
-                        <p class="font-medium text-gray-800" x-text="selectedRestock?.notes || '-'"></p>
-                    </div>
-
-                    <div class="border-t border-gray-100 pt-3">
-                        <span class="text-[10px] font-bold text-gray-400 block mb-2 uppercase tracking-wider">Rincian
-                            Barang</span>
-                        <div class="space-y-2">
-                            <template x-for="(detail, i) in selectedRestock?.details || []" :key="i">
-                                <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-xl">
-                                    <div>
-                                        <p class="font-bold text-gray-900" x-text="detail.name"></p>
-                                        <p class="text-[10px] text-gray-400"
-                                            x-text="detail.qty + ' unit @ Rp ' + (detail.buy || 0).toLocaleString('id-ID')">
-                                        </p>
-                                    </div>
-                                    <span class="font-bold text-gray-800 font-mono"
-                                        x-text="'Rp ' + ((detail.qty * detail.buy) || 0).toLocaleString('id-ID')"></span>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-
-                    <div class="border-t border-gray-100 pt-3 flex items-center justify-between">
-                        <span class="font-semibold text-gray-700">Total Harga</span>
-                        <span class="text-base font-black text-gray-900 font-mono"
-                            x-text="'Rp ' + (selectedRestock?.total_cost || 0).toLocaleString('id-ID')"></span>
-                    </div>
-
-                    <div class="pt-2">
-                        <button type="button" @click="showDetailModal = false"
-                            class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 rounded-xl font-bold transition">
-                            Tutup
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
 
