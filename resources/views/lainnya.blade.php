@@ -40,7 +40,7 @@
             </a>
 
             <!-- Promosi -->
-            <a href="#" class="bg-white rounded-2xl p-4 border border-gray-100 shadow-[0_1px_4px_rgba(0,0,0,0.03)] flex flex-col justify-between min-h-[148px] hover:shadow-md hover:border-gray-200 transition-all group active:scale-[0.98]">
+            <a href="{{ route('promosi.index') }}" class="bg-white rounded-2xl p-4 border border-gray-100 shadow-[0_1px_4px_rgba(0,0,0,0.03)] flex flex-col justify-between min-h-[148px] hover:shadow-md hover:border-gray-200 transition-all group active:scale-[0.98]">
                 <div class="w-10 h-10 rounded-xl bg-[#eef5f0] text-[#1b4332] flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                     <!-- Price Tag Icon -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
