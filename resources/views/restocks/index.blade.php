@@ -28,25 +28,10 @@
     @endphp
 
     <div x-data="{
-        showCreateModal: false,
         searchQuery: '',
         activeFilter: 'all',
         customDate: '',
         allRestocks: {{ Js::from($mergedList) }},
-        items: [
-            { product_id: '{{ $products->first()?->id ?? 1 }}', quantity: 10, purchase_price: 15000, selling_price: 18000 }
-        ],
-        addItem() {
-            this.items.push({ product_id: '{{ $products->first()?->id ?? 1 }}', quantity: 1, purchase_price: 0, selling_price: 0 });
-        },
-        removeItem(index) {
-            if (this.items.length > 1) {
-                this.items.splice(index, 1);
-            }
-        },
-        calculateTotal() {
-            return this.items.reduce((sum, item) => sum + ((parseFloat(item.quantity) || 0) * (parseFloat(item.purchase_price) || 0)), 0);
-        },
         matchesItem(item) {
             const q = this.searchQuery.toLowerCase().trim();
             if (q) {
@@ -113,7 +98,7 @@
         </div>
 
         <!-- 2. Tombol Utama: + Catat Restock -->
-        <button type="button" @click="showCreateModal = true"
+        <a href="{{ route('restocks.create') }}"
             class="w-full bg-[#0a2316] hover:bg-[#123624] text-white py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.99] cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -122,7 +107,7 @@
                 <path d="M8 12h8" />
             </svg>
             <span>+ Catat Restock</span>
-        </button>
+        </a>
 
         <!-- 3. Highlight Card: Bulan Ini (Total Harga) -->
         <div class="bg-[#123b28] text-white rounded-2xl p-4 shadow-[0_2px_10px_rgba(18,59,40,0.15)] space-y-3.5">
@@ -272,121 +257,6 @@
                     class="mt-2 inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition cursor-pointer">
                     <span>Reset Filter</span>
                 </button>
-            </div>
-        </div>
-
-        <!-- 6. MODAL: Catat Restock Baru -->
-        <div x-show="showCreateModal" x-cloak
-            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <div @click.away="showCreateModal = false"
-                class="bg-white w-full max-w-[460px] rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95 duration-200">
-                <!-- Header Modal -->
-                <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                    <div>
-                        <h3 class="font-extrabold text-sm text-gray-900">Catat Barang Masuk (Restock)</h3>
-                        <p class="text-[11px] text-gray-400">Tambah stok &amp; perbarui harga beli modal</p>
-                    </div>
-                    <button type="button" @click="showCreateModal = false"
-                        class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1">&times;</button>
-                </div>
-
-                <!-- Form -->
-                <form action="{{ route('restocks.store') }}" method="POST"
-                    class="p-5 overflow-y-auto space-y-4 flex-1 text-xs">
-                    @csrf
-                    <!-- Tanggal & Catatan -->
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block font-semibold text-gray-700 mb-1">Tanggal Masuk</label>
-                            <input type="date" name="restock_date" value="{{ date('Y-m-d') }}" required
-                                class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#123b28]">
-                        </div>
-                        <div>
-                            <label class="block font-semibold text-gray-700 mb-1">No. Faktur / Catatan</label>
-                            <input type="text" name="notes" placeholder="Contoh: Faktur #AG-882"
-                                class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#123b28]">
-                        </div>
-                    </div>
-
-                    <!-- Daftar Item Barang -->
-                    <div class="space-y-3 pt-2 border-t border-gray-100">
-                        <div class="flex items-center justify-between">
-                            <span class="font-bold text-gray-900">Daftar Item Masuk</span>
-                            <button type="button" @click="addItem()"
-                                class="text-[11px] font-bold text-[#123b28] hover:underline flex items-center gap-1">
-                                + Tambah Baris
-                            </button>
-                        </div>
-
-                        <template x-for="(item, index) in items" :key="index">
-                            <div class="p-3 bg-gray-50/80 rounded-2xl border border-gray-100 space-y-2 relative">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-[10px] font-bold text-gray-400"
-                                        x-text="'Item #' + (index + 1)"></span>
-                                    <button type="button" @click="removeItem(index)" x-show="items.length > 1"
-                                        class="text-rose-500 hover:text-rose-700 text-[10px] font-bold">Hapus</button>
-                                </div>
-
-                                <div>
-                                    <label class="block text-[10px] text-gray-500 mb-0.5">Pilih Produk</label>
-                                    <select :name="'items[' + index + '][product_id]'" x-model="item.product_id"
-                                        required
-                                        class="w-full bg-white border border-gray-200 rounded-xl p-2 text-xs text-gray-800">
-                                        @foreach($products as $prod)
-                                            <option value="{{ $prod->id }}">{{ $prod->name }} (Stok saat ini:
-                                                {{ $prod->stock }} {{ $prod->unit }})
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="grid grid-cols-3 gap-2">
-                                    <div>
-                                        <label class="block text-[10px] text-gray-500 mb-0.5">Jumlah Masuk</label>
-                                        <input type="number" :name="'items[' + index + '][quantity]'"
-                                            x-model.number="item.quantity" min="1" required
-                                            class="w-full bg-white border border-gray-200 rounded-xl p-2 text-xs text-gray-800">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] text-gray-500 mb-0.5">Harga Beli Satuan
-                                            (Rp)</label>
-                                        <input type="number" :name="'items[' + index + '][purchase_price]'"
-                                            x-model.number="item.purchase_price" min="0" required
-                                            class="w-full bg-white border border-gray-200 rounded-xl p-2 text-xs text-gray-800">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] text-gray-500 mb-0.5">Harga Jual Baru
-                                            (Rp)</label>
-                                        <input type="number" :name="'items[' + index + '][selling_price]'"
-                                            x-model.number="item.selling_price" min="0"
-                                            class="w-full bg-white border border-gray-200 rounded-xl p-2 text-xs text-gray-800">
-                                    </div>
-                                </div>
-
-                                <div class="text-right text-[10px] text-gray-500">
-                                    Subtotal: <span class="font-bold text-gray-800 font-mono"
-                                        x-text="'Rp ' + ((item.quantity * item.purchase_price) || 0).toLocaleString('id-ID')"></span>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-
-                    <!-- Total Belanja Kulakan -->
-                    <div
-                        class="p-3 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center justify-between">
-                        <span class="text-xs font-semibold text-emerald-900">Total Harga</span>
-                        <span class="text-sm font-black text-emerald-900 font-mono"
-                            x-text="'Rp ' + calculateTotal().toLocaleString('id-ID')"></span>
-                    </div>
-
-                    <!-- Tombol Submit -->
-                    <div class="pt-2">
-                        <button type="submit"
-                            class="w-full bg-[#0a2316] hover:bg-[#123624] text-white py-3 rounded-xl font-bold text-xs shadow-md transition active:scale-[0.99]">
-                            Simpan Restock &amp; Tambah Stok
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
 

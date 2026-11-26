@@ -51,6 +51,16 @@ class RestockController extends Controller
         ]);
     }
 
+    public function create(): View
+    {
+        Carbon::setLocale('id');
+        $products = Product::where('is_active', true)->orderBy('name')->get();
+
+        return view('restocks.create', [
+            'products' => $products,
+        ]);
+    }
+
     public function show(int $id): View
     {
         Carbon::setLocale('id');

@@ -41,6 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/sales', [CashierController::class, 'index'])->name('sales.index');
 
     Route::get('/restocks', [RestockController::class, 'index'])->name('restocks.index');
+    Route::get('/restocks/create', [RestockController::class, 'create'])->name('restocks.create');
     Route::post('/restocks', [RestockController::class, 'store'])->name('restocks.store');
     Route::get('/restocks/{id}/detail', [RestockController::class, 'show'])->name('restocks.show');
 
