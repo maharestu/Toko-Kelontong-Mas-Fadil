@@ -165,7 +165,7 @@
 
         <!-- 4. Versi Aplikasi -->
         <div class="text-center pt-2 pb-4">
-            <p class="text-xs text-gray-400 font-normal tracking-wide">WarungPOS v1.4.0</p>
+            <p class="text-xs text-gray-400 font-normal tracking-wide">{{ config('app.name') }} v1.4.0</p>
         </div>
     </div>
 </x-app-layout>

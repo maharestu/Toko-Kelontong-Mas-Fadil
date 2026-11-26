@@ -3,7 +3,7 @@
         MA
     </div>
     <div>
-        <h1 class="text-base font-bold text-gray-900 leading-tight">Toko Mas Adil</h1>
+        <h1 class="text-base font-bold text-gray-900 leading-tight">{{ config('app.name') }}</h1>
         <p class="text-xs text-gray-500 font-normal">Sistem Manajemen Toko Kelontong</p>
     </div>
 </div>

@@ -1,4 +1,4 @@
-<x-app-layout title="Kelola Kategori - Toko Kelontong Mas Fadil" active="produk">
+<x-app-layout :title="'Kelola Kategori - '.config('app.name')" active="produk">
     <div class="px-4 pt-4 pb-6">
         <!-- Back to Products -->
         <div class="flex items-center justify-between mb-3">

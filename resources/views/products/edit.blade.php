@@ -1,4 +1,4 @@
-<x-app-layout title="Edit Produk - Toko Kelontong Mas Fadil" active="produk">
+<x-app-layout :title="'Edit Produk - '.config('app.name')" active="produk">
     <div class="px-4 pt-4 pb-6">
         <!-- Top Navigation Bar (Kembali, Tanpa Toko Aktif) -->
         <div class="flex items-center justify-between mb-4">

@@ -1,4 +1,4 @@
-<x-app-layout title="Tambah Restock - Toko Kelontong Mas Fadil" active="lainnya">
+<x-app-layout :title="'Tambah Restock - '.config('app.name')" active="lainnya">
     @php
         // Serialisasikan data produk katalog ke JSON untuk Alpine.js
         $catalogProducts = $products->map(fn($p) => [

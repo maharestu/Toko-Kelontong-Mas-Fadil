@@ -1,4 +1,4 @@
-<x-app-layout title="Laporan - Toko Mas Adil" active="lainnya">
+<x-app-layout :title="'Laporan - '.config('app.name')" active="lainnya">
     @push('styles')
         <style>
             .no-scrollbar::-webkit-scrollbar { display: none; }

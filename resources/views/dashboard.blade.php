@@ -7,7 +7,7 @@
                     MA
                 </div>
                 <div>
-                    <h2 class="text-sm font-bold text-gray-900 leading-tight">Toko Mas Adil</h2>
+                    <h2 class="text-sm font-bold text-gray-900 leading-tight">{{ config('app.name') }}</h2>
                     <p class="text-[11px] text-gray-400 font-normal">{{ ucfirst(Auth::user()?->role instanceof \App\Enums\UserRole ? Auth::user()->role->value : (Auth::user()?->role ?? 'Admin')) }}</p>
                 </div>
             </div>

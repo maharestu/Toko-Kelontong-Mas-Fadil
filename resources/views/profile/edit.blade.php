@@ -1,4 +1,4 @@
-<x-app-layout title="Profil Pengguna - Toko Mas Adil" active="lainnya">
+<x-app-layout :title="'Profil Pengguna - '.config('app.name')" active="lainnya">
     <div class="p-4 sm:p-5 space-y-4">
         <!-- Header & Back Link -->
         <div>

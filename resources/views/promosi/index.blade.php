@@ -1,4 +1,4 @@
-<x-app-layout title="Promosi - Toko Kelontong Mas Fadil" active="poster">
+<x-app-layout :title="'Promosi - '.config('app.name')" active="poster">
     <div class="px-4 pt-4 pb-6 space-y-4">
         <!-- 1. Top Bar / Back to Lainnya -->
         <div class="flex items-center justify-between">
@@ -129,7 +129,7 @@
                     <label for="promo-desc-input" class="text-xs font-semibold text-gray-800">Deskripsi Promosi</label>
                     <span id="desc-char-count" class="text-[11px] font-mono tabular-nums text-gray-400">74/120</span>
                 </div>
-                <textarea id="promo-desc-input" rows="2" maxlength="120" placeholder="Belanja hemat kebutuhan pokok..." class="w-full px-3 py-2 bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#173628] focus:outline-none rounded-xl text-xs text-gray-900 resize-none transition-colors">Belanja hemat kebutuhan pokok menyambut bulan suci hanya di Toko Mas Fadil.</textarea>
+                <textarea id="promo-desc-input" rows="2" maxlength="120" placeholder="Belanja hemat kebutuhan pokok..." class="w-full px-3 py-2 bg-gray-50 border border-gray-200 focus:bg-white focus:border-[#173628] focus:outline-none rounded-xl text-xs text-gray-900 resize-none transition-colors">Belanja hemat kebutuhan pokok menyambut bulan suci hanya di {{ config('app.name') }}.</textarea>
             </div>
         </section>
 
@@ -213,7 +213,7 @@
             selectedProductIds: STORE_PRODUCTS.filter(p => p.categoryId === defaultCatId).map(p => p.id),
             searchQuery: '',
             promoTitle: 'Promo Berkah Ramadan!',
-            promoDesc: 'Belanja hemat kebutuhan pokok menyambut bulan suci hanya di Toko Mas Fadil.',
+            promoDesc: @js('Belanja hemat kebutuhan pokok menyambut bulan suci hanya di '.config('app.name').'.'),
             isGenerating: false,
         };
 
@@ -457,7 +457,7 @@
             ctx.textAlign = 'left';
             ctx.fillStyle = isRamadan ? '#FDE68A' : '#FFFFFF';
             ctx.font = '800 28px sans-serif';
-            ctx.fillText('TOKO KELONTONG MAS FADIL', 64, H - 56);
+            ctx.fillText(@js(strtoupper(config('app.name'))), 64, H - 56);
             ctx.fillStyle = '#C5DBD2';
             ctx.font = '500 20px sans-serif';
             ctx.fillText('Kebutuhan Pokok Terlengkap & Terpercaya', 64, H - 26);
