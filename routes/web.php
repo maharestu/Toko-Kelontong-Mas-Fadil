@@ -41,6 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/restocks', [RestockController::class, 'index'])->name('restocks.index');
     Route::post('/restocks', [RestockController::class, 'store'])->name('restocks.store');
+    Route::get('/restocks/{id}/detail', [RestockController::class, 'show'])->name('restocks.show');
 });
 
 Route::middleware('auth')->group(function () {
@@ -53,4 +54,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

@@ -2,9 +2,11 @@
     <div class="p-4 sm:p-5 space-y-4">
         <!-- Header & Back Link -->
         <div>
-            <a href="{{ route('lainnya') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-700 hover:text-black mb-2 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m15 18-6-6 6-6"/>
+            <a href="{{ route('dashboard') }}"
+                class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-700 hover:text-black mb-2 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m15 18-6-6 6-6" />
                 </svg>
                 <span>Menu Lainnya</span>
             </a>
