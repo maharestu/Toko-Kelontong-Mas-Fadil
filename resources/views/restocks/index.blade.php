@@ -28,11 +28,15 @@
     @endphp
 
     <div x-data="{
+<<<<<<< HEAD
         showCreateModal: false,
+=======
+>>>>>>> afb036ce7eeef87ec3e9c3b5649b20b4f3efaf65
         searchQuery: '',
         activeFilter: 'all',
         customDate: '',
         allRestocks: {{ Js::from($mergedList) }},
+<<<<<<< HEAD
         items: [
             { product_id: '{{ $products->first()?->id ?? 1 }}', quantity: 10, purchase_price: 15000, selling_price: 18000 }
         ],
@@ -42,8 +46,47 @@
         removeItem(index) {
             if (this.items.length > 1) {
                 this.items.splice(index, 1);
+=======
+        matchesItem(item) {
+            const q = this.searchQuery.toLowerCase().trim();
+            if (q) {
+                const inCode = item.code && item.code.toLowerCase().includes(q);
+                const inNotes = item.notes && item.notes.toLowerCase().includes(q);
+                const inAuthor = item.author && item.author.toLowerCase().includes(q);
+                const inSummary = item.summary && item.summary.toLowerCase().includes(q);
+                if (!inCode && !inNotes && !inAuthor && !inSummary) {
+                    return false;
+                }
+>>>>>>> afb036ce7eeef87ec3e9c3b5649b20b4f3efaf65
             }
+
+            if (this.activeFilter === 'all') {
+                return true;
+            }
+
+            if (!item.raw_date) return false;
+
+            const today = new Date();
+            const target = new Date(item.raw_date + 'T00:00:00');
+
+            if (this.activeFilter === 'month') {
+                return target.getFullYear() === today.getFullYear() && target.getMonth() === today.getMonth();
+            }
+
+            if (this.activeFilter === 'week') {
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(today.getDate() - 7);
+                sevenDaysAgo.setHours(0, 0, 0, 0);
+                return target >= sevenDaysAgo && target <= new Date(today.getTime() + 86400000);
+            }
+
+            if (this.activeFilter === 'custom' && this.customDate) {
+                return item.raw_date === this.customDate;
+            }
+
+            return true;
         },
+<<<<<<< HEAD
         calculateTotal() {
             return this.items.reduce((sum, item) => sum + ((parseFloat(item.quantity) || 0) * (parseFloat(item.purchase_price) || 0)), 0);
         },
@@ -85,6 +128,8 @@
 
             return true;
         },
+=======
+>>>>>>> afb036ce7eeef87ec3e9c3b5649b20b4f3efaf65
         get filteredRestocks() {
             return this.allRestocks.filter(item => this.matchesItem(item));
         },
@@ -113,7 +158,11 @@
         </div>
 
         <!-- 2. Tombol Utama: + Catat Restock -->
+<<<<<<< HEAD
         <button type="button" @click="showCreateModal = true"
+=======
+        <a href="{{ route('restocks.create') }}"
+>>>>>>> afb036ce7eeef87ec3e9c3b5649b20b4f3efaf65
             class="w-full bg-[#0a2316] hover:bg-[#123624] text-white py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.99] cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -122,7 +171,7 @@
                 <path d="M8 12h8" />
             </svg>
             <span>+ Catat Restock</span>
-        </button>
+        </a>
 
         <!-- 3. Highlight Card: Bulan Ini (Total Harga) -->
         <div class="bg-[#123b28] text-white rounded-2xl p-4 shadow-[0_2px_10px_rgba(18,59,40,0.15)] space-y-3.5">
@@ -250,6 +299,7 @@
                     </div>
                 </div>
             </template>
+<<<<<<< HEAD
 
             <!-- Empty State: Belum ada data di database -->
             <div x-show="allRestocks.length === 0" class="bg-white rounded-2xl p-8 border border-gray-100 text-center space-y-1">
@@ -387,8 +437,35 @@
                         </button>
                     </div>
                 </form>
+=======
+
+            <!-- Empty State: Belum ada data di database -->
+            <div x-show="allRestocks.length === 0" class="bg-white rounded-2xl p-8 border border-gray-100 text-center space-y-1">
+                <p class="text-sm font-bold text-gray-700">Belum ada riwayat restock</p>
+                <p class="text-xs text-gray-400">Klik tombol "+ Catat Restock" di atas untuk menambahkan barang masuk.</p>
+>>>>>>> afb036ce7eeef87ec3e9c3b5649b20b4f3efaf65
+            </div>
+
+<<<<<<< HEAD
+=======
+            <!-- Empty State: Hasil Pencarian / Filter Tidak Ditemukan -->
+            <div x-show="allRestocks.length > 0 && filteredRestocks.length === 0"
+                class="bg-white rounded-2xl p-8 border border-gray-100 text-center space-y-2">
+                <div class="w-10 h-10 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mx-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <circle cx="11" cy="11" r="8" stroke-width="2" />
+                        <path d="m21 21-4.3-4.3" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </div>
+                <p class="text-sm font-bold text-gray-800">Tidak ada riwayat restock yang cocok</p>
+                <p class="text-xs text-gray-400">Coba ubah kata kunci pencarian atau ganti filter tanggal.</p>
+                <button type="button" @click="searchQuery = ''; activeFilter = 'all'; customDate = '';"
+                    class="mt-2 inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition cursor-pointer">
+                    <span>Reset Filter</span>
+                </button>
             </div>
         </div>
 
+>>>>>>> afb036ce7eeef87ec3e9c3b5649b20b4f3efaf65
     </div>
 </x-app-layout>
