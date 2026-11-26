@@ -315,7 +315,7 @@ class ProductManagementTest extends TestCase
             'user_id' => $user->id,
             'order_type' => 'direct',
             'total_amount' => 30000,
-            'payment_type' => 'tunai',
+            'payment_type' => 'langsung',
         ]);
 
         SaleDetail::create([

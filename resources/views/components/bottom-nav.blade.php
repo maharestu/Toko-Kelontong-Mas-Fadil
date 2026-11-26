@@ -6,7 +6,7 @@
     $isHome = $active ? $active === 'home' : request()->routeIs('dashboard');
     $isProduk = $active ? $active === 'produk' : (request()->routeIs('products.*') || request()->routeIs('categories.*'));
     $isKasir = $active ? $active === 'kasir' : (request()->routeIs('cashier.*') || request()->routeIs('sales.*'));
-    $isPoster = $active ? $active === 'poster' : false;
+    $isPoster = $active ? $active === 'poster' : request()->routeIs('promosi.*');
     $isLainnya = $active
         ? $active === 'lainnya'
         : (request()->routeIs('lainnya') || request()->routeIs('restocks.*') || request()->routeIs('laporan*') || request()->routeIs('profile.*'));
@@ -45,7 +45,7 @@
             </a>
 
             <!-- Poster -->
-            <a href="#" class="flex flex-col items-center gap-1 {{ $isPoster ? 'text-[#173628]' : 'text-gray-400 hover:text-gray-700 transition' }}">
+            <a href="{{ route('promosi.index') }}" class="flex flex-col items-center gap-1 {{ $isPoster ? 'text-[#173628]' : 'text-gray-400 hover:text-gray-700 transition' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $isPoster ? '2.2' : '2' }}" stroke-linecap="round" stroke-linejoin="round">
                     <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
                     <circle cx="9" cy="9" r="2"/>
