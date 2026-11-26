@@ -12,6 +12,9 @@ use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
+    /**
+     * Tampilkan halaman utama dashboard ringkasan toko.
+     */
     public function index(Request $request): View
     {
         Carbon::setLocale('id');
@@ -22,7 +25,7 @@ class DashboardController extends Controller
         $todaySales = Sale::whereDate('created_at', $today);
         $todayTotal = (float) $todaySales->sum('total_amount');
         $todayCount = $todaySales->count();
-        $todayAvg = $todayCount > 0 ? $todayTotal / $todayCount : 0;
+        $todayAvg = $todayCount > 0 ? $todayTotal / $todayCount : 0.0;
 
         // Penjualan Kemarin & Persentase Perubahan
         $yesterdayTotal = (float) Sale::whereDate('created_at', $yesterday)->sum('total_amount');
@@ -33,61 +36,71 @@ class DashboardController extends Controller
         }
 
         // Estimasi Laba Kotor Hari Ini & Margin
-        $todayProfit = (float) SaleDetail::whereHas('sale', function ($q) use ($today) {
-            $q->whereDate('created_at', $today);
+        $todayProfit = (float) SaleDetail::whereHas('sale', function ($query) use ($today): void {
+            $query->whereDate('created_at', $today);
         })->sum(DB::raw('(selling_price_snapshot - cost_price_snapshot) * quantity'));
 
-        $effectiveMargin = $todayTotal > 0 ? round(($todayProfit / $todayTotal) * 100, 1) : 0;
+        $effectiveMargin = $todayTotal > 0 ? round(($todayProfit / $todayTotal) * 100, 1) : 0.0;
 
-        // 2. Tren Penjualan 7 Hari Terakhir
+        // 2. Tren Penjualan 7 Hari Terakhir (1 query agregasi di PHP agar lintas driver DB)
+        $trendStart = $today->copy()->subDays(6)->startOfDay();
+        $trendEnd = $today->copy()->endOfDay();
+
+        $salesByDate = Sale::whereBetween('created_at', [$trendStart, $trendEnd])
+            ->get(['total_amount', 'created_at'])
+            ->groupBy(fn (Sale $sale): string => $sale->created_at->toDateString())
+            ->map(fn ($group): float => (float) $group->sum('total_amount'));
+
         $sevenDaysTrend = [];
-        $totalSevenDays = 0;
-        $maxSales = 1; // Menghindari pembagian dengan 0
+        $totalSevenDays = 0.0;
+        $maxSales = 0.0;
 
         for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::today()->subDays($i);
-            $dayTotal = (float) Sale::whereDate('created_at', $date)->sum('total_amount');
+            $date = $today->copy()->subDays($i);
+            $dateKey = $date->toDateString();
+            $dayTotal = (float) ($salesByDate->get($dateKey) ?? 0.0);
             $totalSevenDays += $dayTotal;
 
             if ($dayTotal > $maxSales) {
                 $maxSales = $dayTotal;
             }
 
-            $dayLabel = $i === 0 ? 'Hari Ini' : $this->getIndonesianDayShort($date->dayOfWeek);
-
-            // Format ringkas (misal: 3.5jt atau 85rb)
-            $shortAmount = $this->formatShortAmount($dayTotal);
-
             $sevenDaysTrend[] = [
-                'date' => $date->toDateString(),
-                'day_label' => $dayLabel,
+                'date' => $dateKey,
+                'day_label' => $i === 0 ? 'Hari Ini' : $this->getIndonesianDayShort($date->dayOfWeek),
                 'total' => $dayTotal,
-                'short_amount' => $shortAmount,
+                'short_amount' => $this->formatShortAmount($dayTotal),
                 'is_today' => $i === 0,
             ];
         }
 
-        // Hitung persentase tinggi bar visual (min 15% agar selalu ada bar yang terlihat)
         foreach ($sevenDaysTrend as &$trend) {
             if ($maxSales > 0 && $trend['total'] > 0) {
-                $heightPct = round(($trend['total'] / $maxSales) * 100);
+                $heightPct = (int) round(($trend['total'] / $maxSales) * 100);
                 $trend['height_pct'] = max(20, $heightPct);
             } else {
-                $trend['height_pct'] = 15;
+                $trend['height_pct'] = 12;
             }
         }
         unset($trend);
 
         $sevenDaysAvg = $totalSevenDays / 7;
 
-        // 3. Stok Menipis (Stok <= 15 atau batas minimum)
-        $lowStockProducts = Product::where('is_active', true)
-            ->where('stock', '<=', 15)
+        // 3. Stok Menipis (Stok <= 15) & Total Produk Kritis (Stok <= 5)
+        $lowStockBaseQuery = Product::where('is_active', true)
+            ->where('stock', '<=', 15);
+
+        $criticalCount = (clone $lowStockBaseQuery)
+            ->where('stock', '<=', 5)
+            ->count();
+
+        $lowStockProducts = $lowStockBaseQuery
             ->orderBy('stock', 'asc')
             ->take(5)
             ->get()
-            ->map(function ($product) {
+            ->map(function (Product $product): array {
                 $isUrgent = $product->stock <= 5;
+
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
@@ -99,18 +112,14 @@ class DashboardController extends Controller
                 ];
             });
 
-        $criticalCount = $lowStockProducts->where('is_urgent', true)->count();
-
         // 4. Informasi Shift & Tanggal
         $indonesianDays = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
         $indonesianMonths = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-        
-        $currentDateFormatted = $indonesianDays[Carbon::now()->dayOfWeek] . ', ' . 
-            Carbon::now()->day . ' ' . 
-            $indonesianMonths[Carbon::now()->month] . ' ' . 
-            Carbon::now()->year;
 
-        $hour = Carbon::now()->hour;
+        $now = Carbon::now();
+        $currentDateFormatted = $indonesianDays[$now->dayOfWeek].', '.$now->day.' '.$indonesianMonths[$now->month].' '.$now->year;
+
+        $hour = $now->hour;
         $shiftName = ($hour >= 6 && $hour < 15) ? 'Shift Pagi' : (($hour >= 15 && $hour < 22) ? 'Shift Sore' : 'Shift Malam');
 
         return view('dashboard', [
@@ -133,17 +142,20 @@ class DashboardController extends Controller
     private function getIndonesianDayShort(int $dayOfWeek): string
     {
         $days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+
         return $days[$dayOfWeek] ?? '';
     }
 
     private function formatShortAmount(float $amount): string
     {
         if ($amount >= 1000000) {
-            return round($amount / 1000000, 1) . 'M';
+            return round($amount / 1000000, 1).'jt';
         }
+
         if ($amount >= 1000) {
-            return round($amount / 1000, 0) . 'rb';
+            return round($amount / 1000, 0).'rb';
         }
-        return (string) $amount;
+
+        return (string) ((int) round($amount));
     }
 }

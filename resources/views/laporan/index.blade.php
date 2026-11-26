@@ -66,7 +66,7 @@
                         <rect width="18" height="18" x="3" y="4" rx="2"/>
                         <path d="M3 10h18"/>
                     </svg>
-                    <span id="date-range-label">Selasa, 24 Nov 2026</span>
+                    <span id="date-range-label">{{ $reportData['today']['dateRange'] }}</span>
                 </div>
                 <span class="text-[11px] text-gray-400">Update otomatis</span>
             </div>
@@ -78,12 +78,12 @@
             <div class="bg-white border border-gray-100 rounded-2xl p-3.5 flex flex-col justify-between shadow-[0_2px_10px_-2px_rgba(0,0,0,0.04)]">
                 <div class="flex items-center justify-between gap-1">
                     <span class="text-xs font-medium text-gray-500">Total Omzet</span>
-                    <span id="kpi-omzet-trend" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-[#173628] tabular-nums">
-                        +8,6%
+                    <span id="kpi-omzet-trend" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold {{ $reportData['today']['omzetTrend']['positive'] ? 'bg-emerald-50 text-[#173628]' : 'bg-rose-50 text-rose-700' }} tabular-nums">
+                        {{ $reportData['today']['omzetTrend']['text'] }}
                     </span>
                 </div>
                 <div id="kpi-omzet" class="mt-2 text-base font-bold text-gray-900 tabular-nums tracking-tight">
-                    Rp 1.920.000
+                    Rp {{ number_format($reportData['today']['omzet'], 0, ',', '.') }}
                 </div>
                 <span class="mt-1 text-[11px] text-gray-400">vs periode lalu</span>
             </div>
@@ -92,15 +92,15 @@
             <div class="bg-white border border-gray-100 rounded-2xl p-3.5 flex flex-col justify-between shadow-[0_2px_10px_-2px_rgba(0,0,0,0.04)]">
                 <div class="flex items-center justify-between gap-1">
                     <span class="text-xs font-medium text-gray-500">Laba Bersih</span>
-                    <span id="kpi-laba-trend" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-[#173628] tabular-nums">
-                        +9,1%
+                    <span id="kpi-laba-trend" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold {{ $reportData['today']['labaTrend']['positive'] ? 'bg-emerald-50 text-[#173628]' : 'bg-rose-50 text-rose-700' }} tabular-nums">
+                        {{ $reportData['today']['labaTrend']['text'] }}
                     </span>
                 </div>
                 <div id="kpi-laba" class="mt-2 text-base font-bold text-[#173628] tabular-nums tracking-tight">
-                    Rp 448.000
+                    Rp {{ number_format($reportData['today']['laba'], 0, ',', '.') }}
                 </div>
                 <span id="kpi-margin" class="mt-1 text-[11px] text-[#173628] font-medium tabular-nums">
-                    Margin 23,3%
+                    {{ $reportData['today']['margin'] }}
                 </span>
             </div>
 
@@ -108,12 +108,12 @@
             <div class="bg-white border border-gray-100 rounded-2xl p-3.5 flex flex-col justify-between shadow-[0_2px_10px_-2px_rgba(0,0,0,0.04)]">
                 <div class="flex items-center justify-between gap-1">
                     <span class="text-xs font-medium text-gray-500">Total Transaksi</span>
-                    <span id="kpi-trx-trend" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-[#173628] tabular-nums">
-                        +14,3%
+                    <span id="kpi-trx-trend" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold {{ $reportData['today']['trxTrend']['positive'] ? 'bg-emerald-50 text-[#173628]' : 'bg-rose-50 text-rose-700' }} tabular-nums">
+                        {{ $reportData['today']['trxTrend']['text'] }}
                     </span>
                 </div>
                 <div id="kpi-trx-count" class="mt-2 text-base font-bold text-gray-900 tabular-nums tracking-tight">
-                    24 Trx
+                    {{ $reportData['today']['trxCount'] }} Trx
                 </div>
                 <span class="mt-1 text-[11px] text-gray-400">Struk selesai</span>
             </div>
@@ -122,12 +122,12 @@
             <div class="bg-white border border-gray-100 rounded-2xl p-3.5 flex flex-col justify-between shadow-[0_2px_10px_-2px_rgba(0,0,0,0.04)]">
                 <div class="flex items-center justify-between gap-1">
                     <span class="text-xs font-medium text-gray-500">Rata-rata/Trx</span>
-                    <span id="kpi-avg-trend" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 tabular-nums">
-                        -2,4%
+                    <span id="kpi-avg-trend" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold {{ $reportData['today']['avgTrend']['positive'] ? 'bg-emerald-50 text-[#173628]' : 'bg-rose-50 text-rose-700' }} tabular-nums">
+                        {{ $reportData['today']['avgTrend']['text'] }}
                     </span>
                 </div>
                 <div id="kpi-avg-trx" class="mt-2 text-base font-bold text-gray-900 tabular-nums tracking-tight">
-                    Rp 80.000
+                    Rp {{ number_format($reportData['today']['avgTrx'], 0, ',', '.') }}
                 </div>
                 <span class="mt-1 text-[11px] text-gray-400">Nilai per struk</span>
             </div>
@@ -209,11 +209,11 @@
                 <div class="flex items-center gap-2 min-w-0">
                     <span class="w-2 h-2 rounded-full bg-[#173628] shrink-0"></span>
                     <span id="chart-selected-date" class="text-xs font-medium text-gray-500 truncate">
-                        Selasa, 24 Nov • 14:00–16:00
+                        {{ $reportData['today']['dateRange'] }}
                     </span>
                 </div>
                 <span id="chart-selected-value" class="text-xs font-bold text-[#173628] tabular-nums shrink-0">
-                    Rp 115.000
+                    Rp {{ number_format($reportData['today']['laba'], 0, ',', '.') }}
                 </span>
             </div>
 
@@ -372,102 +372,14 @@
                 return 'Rp ' + Number(amount).toLocaleString('id-ID');
             }
 
-            const REPORT_DATA = {
-                today: {
-                    label: 'Hari Ini',
-                    fileSuffix: 'Hari_Ini',
-                    dateRange: 'Selasa, 24 Nov 2026',
-                    omzet: 1920000,
-                    omzetTrend: { text: '+8,6%', positive: true },
-                    laba: 448000,
-                    labaTrend: { text: '+9,1%', positive: true },
-                    margin: 'Margin 23,3%',
-                    trxCount: 24,
-                    trxTrend: { text: '+14,3%', positive: true },
-                    avgTrx: 80000,
-                    avgTrend: { text: '-2,4%', positive: false },
-                    chart: [
-                        { label: '08:00', fullDate: 'Selasa, 24 Nov • 08:00–10:00', omzet: 245000, laba: 56000 },
-                        { label: '10:00', fullDate: 'Selasa, 24 Nov • 10:00–12:00', omzet: 410000, laba: 98000 },
-                        { label: '12:00', fullDate: 'Selasa, 24 Nov • 12:00–14:00', omzet: 365000, laba: 84000 },
-                        { label: '14:00', fullDate: 'Selasa, 24 Nov • 14:00–16:00', omzet: 485000, laba: 115000 },
-                        { label: '16:00', fullDate: 'Selasa, 24 Nov • 16:00–18:00', omzet: 270000, laba: 62000 },
-                        { label: '18:00', fullDate: 'Selasa, 24 Nov • 18:00–20:00', omzet: 145000, laba: 33000 },
-                    ],
-                    defaultBarIndex: 3,
-                    products: [
-                        { name: 'Beras Ramos Setra 5kg', unit: 'krg', sold: 7, revenue: 504000 },
-                        { name: 'Minyak Goreng Tropical 2L', unit: 'btl', sold: 11, revenue: 418000 },
-                        { name: 'Telur Ayam 1kg', unit: 'kg', sold: 10, revenue: 290000 },
-                        { name: 'Indomie Goreng 1 Dus', unit: 'dus', sold: 2, revenue: 236000 },
-                        { name: 'Gula Pasir Gulaku 1kg', unit: 'pcs', sold: 12, revenue: 216000 },
-                        { name: 'Gas LPG 3kg', unit: 'tbg', sold: 8, revenue: 176000 },
-                    ],
-                    transactions: [
-                        { id: '#TRX-1042', time: '14:20', fullTime: '24 Nov 2026 • 14:20 WIB', method: 'Tunai', itemsCount: 4, total: 148000 },
-                        { id: '#TRX-1041', time: '13:55', fullTime: '24 Nov 2026 • 13:55 WIB', method: 'QRIS', itemsCount: 2, total: 76000 },
-                    ],
-                    payments: [
-                        { method: 'Tunai', trx: 15, amount: 1120000, percent: 58 },
-                        { method: 'QRIS', trx: 7, amount: 564000, percent: 29 },
-                        { method: 'Transfer', trx: 2, amount: 236000, percent: 13 },
-                    ],
-                },
-                week: {
-                    label: 'Minggu Ini',
-                    fileSuffix: 'Minggu_Ini',
-                    dateRange: '18 Nov – 24 Nov 2026',
-                    omzet: 12450000,
-                    omzetTrend: { text: '+14,2%', positive: true },
-                    laba: 2840000,
-                    labaTrend: { text: '+11,5%', positive: true },
-                    margin: 'Margin 22,8%',
-                    trxCount: 148,
-                    trxTrend: { text: '+9,6%', positive: true },
-                    avgTrx: 84121,
-                    avgTrend: { text: '-1,8%', positive: false },
-                    chart: [
-                        { label: 'Sen', fullDate: 'Senin, 18 Nov 2026', omzet: 1420000, laba: 325000 },
-                        { label: 'Sel', fullDate: 'Selasa, 19 Nov 2026', omzet: 1680000, laba: 382000 },
-                        { label: 'Rab', fullDate: 'Rabu, 20 Nov 2026', omzet: 1540000, laba: 348000 },
-                        { label: 'Kam', fullDate: 'Kamis, 21 Nov 2026', omzet: 1810000, laba: 415000 },
-                        { label: 'Jum', fullDate: 'Jumat, 22 Nov 2026', omzet: 1740000, laba: 396000 },
-                        { label: 'Sab', fullDate: 'Sabtu, 23 Nov 2026', omzet: 2340000, laba: 538000 },
-                        { label: 'Min', fullDate: 'Minggu, 24 Nov 2026', omzet: 1920000, laba: 436000 },
-                    ],
-                    defaultBarIndex: 5,
-                    products: [],
-                    transactions: [],
-                    payments: [],
-                },
-                month: {
-                    label: 'Bulan Ini',
-                    fileSuffix: 'Bulan_Ini',
-                    dateRange: '1 Nov – 24 Nov 2026',
-                    omzet: 46820000,
-                    omzetTrend: { text: '+18,9%', positive: true },
-                    laba: 10860000,
-                    labaTrend: { text: '+16,4%', positive: true },
-                    margin: 'Margin 23,2%',
-                    trxCount: 542,
-                    trxTrend: { text: '+12,1%', positive: true },
-                    avgTrx: 86383,
-                    avgTrend: { text: '+5,2%', positive: true },
-                    chart: [],
-                    defaultBarIndex: 0,
-                    products: [],
-                    transactions: [],
-                    payments: [],
-                }
-            };
+            const REPORT_DATA = @json($reportData);
 
             const appState = {
                 period: 'today',
                 chartMetric: 'laba',
-                selectedBarIndex: 3,
+                selectedBarIndex: REPORT_DATA.today.defaultBarIndex ?? 0,
                 activeDetailTab: 'products',
                 exportPeriod: 'today',
-                exportFormat: 'xlsx',
                 exportSheets: { summary: true, products: true, transactions: true, payments: true }
             };
 
@@ -482,20 +394,28 @@
                 }, 2500);
             }
 
+            function applyTrendBadge(elId, trend) {
+                const el = document.getElementById(elId);
+                el.textContent = trend.text;
+                el.className = trend.positive
+                    ? 'inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-[#173628] tabular-nums'
+                    : 'inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 tabular-nums';
+            }
+
             function renderAll() {
                 const data = REPORT_DATA[appState.period];
                 document.getElementById('date-range-label').textContent = data.dateRange;
                 document.getElementById('quick-export-desc').textContent = `4 sheet lengkap • Periode ${data.label}`;
 
                 document.getElementById('kpi-omzet').textContent = formatRupiah(data.omzet);
-                document.getElementById('kpi-omzet-trend').textContent = data.omzetTrend.text;
+                applyTrendBadge('kpi-omzet-trend', data.omzetTrend);
                 document.getElementById('kpi-laba').textContent = formatRupiah(data.laba);
-                document.getElementById('kpi-laba-trend').textContent = data.labaTrend.text;
+                applyTrendBadge('kpi-laba-trend', data.labaTrend);
                 document.getElementById('kpi-margin').textContent = data.margin;
                 document.getElementById('kpi-trx-count').textContent = `${data.trxCount} Trx`;
-                document.getElementById('kpi-trx-trend').textContent = data.trxTrend.text;
+                applyTrendBadge('kpi-trx-trend', data.trxTrend);
                 document.getElementById('kpi-avg-trx').textContent = formatRupiah(data.avgTrx);
-                document.getElementById('kpi-avg-trend').textContent = data.avgTrend.text;
+                applyTrendBadge('kpi-avg-trend', data.avgTrend);
 
                 renderBarChart();
                 renderDetailTab();
@@ -510,7 +430,7 @@
                 if (!chartItems || chartItems.length === 0) {
                     document.getElementById('chart-selected-date').textContent = data.dateRange;
                     document.getElementById('chart-selected-value').textContent = formatRupiah(metric === 'laba' ? data.laba : data.omzet);
-                    container.innerHTML = `<div class="w-full h-full flex items-center justify-center text-xs text-gray-400">Belum ada data grafik harian untuk periode ini.</div>`;
+                    container.innerHTML = `<div class="w-full h-full flex items-center justify-center text-xs text-gray-400">Belum ada data penjualan untuk periode ini.</div>`;
                     return;
                 }
 
@@ -522,7 +442,7 @@
 
                 container.innerHTML = chartItems.map((item, idx) => {
                     const isSelected = idx === appState.selectedBarIndex;
-                    const heightPct = Math.max(16, Math.round((item[metric] / maxVal) * 100));
+                    const heightPct = item[metric] > 0 ? Math.max(16, Math.round((item[metric] / maxVal) * 100)) : 8;
 
                     return `
                         <button type="button" onclick="selectChartBar(${idx})" class="flex-1 h-full flex flex-col items-center justify-end gap-2 group focus:outline-none cursor-pointer">
@@ -580,7 +500,7 @@
                                 <div class="py-2.5 first:pt-0.5 last:pb-0.5 flex items-center justify-between gap-3">
                                     <div class="min-w-0">
                                         <div class="text-xs font-bold text-gray-900">${t.id} <span class="font-normal text-gray-400">• ${t.method}</span></div>
-                                        <div class="text-[11px] text-gray-400">${t.fullTime} • ${t.itemsCount} item</div>
+                                        <div class="text-[11px] text-gray-400 truncate">${t.fullTime} • ${t.itemsCount} item • ${t.customer}</div>
                                     </div>
                                     <div class="text-xs font-bold text-[#173628] tabular-nums shrink-0">${formatRupiah(t.total)}</div>
                                 </div>
@@ -609,12 +529,131 @@
                 }
             }
 
+            function syncExportModalUI() {
+                document.querySelectorAll('.export-period-btn').forEach(btn => {
+                    const active = btn.getAttribute('data-export-period') === appState.exportPeriod;
+                    btn.className = active
+                        ? 'export-period-btn py-1.5 text-xs font-semibold rounded-lg bg-white text-[#173628] border border-gray-100 transition-all cursor-pointer'
+                        : 'export-period-btn py-1.5 text-xs font-semibold rounded-lg text-gray-500 transition-all cursor-pointer';
+                });
+
+                const checkboxes = document.querySelectorAll('.export-sheet-cb');
+                let selectedCount = 0;
+                checkboxes.forEach(cb => {
+                    cb.checked = !!appState.exportSheets[cb.value];
+                    if (cb.checked) selectedCount++;
+                });
+
+                document.getElementById('selected-sheets-count').textContent = `${selectedCount}/4 dipilih`;
+                const downloadBtn = document.getElementById('confirm-download-btn');
+                downloadBtn.disabled = selectedCount === 0;
+                downloadBtn.classList.toggle('opacity-50', selectedCount === 0);
+                downloadBtn.classList.toggle('cursor-not-allowed', selectedCount === 0);
+            }
+
+            function exportToExcel(periodKey, sheets) {
+                if (typeof XLSX === 'undefined') {
+                    showToast('Library Excel belum termuat. Periksa koneksi internet.');
+                    return;
+                }
+
+                const data = REPORT_DATA[periodKey];
+                const workbook = XLSX.utils.book_new();
+                let sheetAdded = false;
+
+                if (sheets.summary) {
+                    const summaryRows = [
+                        ['LAPORAN PENJUALAN TOKO'],
+                        ['Periode', `${data.label} (${data.dateRange})`],
+                        [],
+                        ['Metrik', 'Nilai', 'Tren vs Periode Lalu'],
+                        ['Total Omzet', data.omzet, data.omzetTrend.text],
+                        ['Laba Kotor', data.laba, data.labaTrend.text],
+                        ['Margin', data.margin, ''],
+                        ['Total Transaksi', data.trxCount, data.trxTrend.text],
+                        ['Rata-rata per Transaksi', data.avgTrx, data.avgTrend.text],
+                    ];
+
+                    if (data.chart && data.chart.length > 0) {
+                        summaryRows.push([], ['Rincian Grafik', 'Omzet (Rp)', 'Laba (Rp)']);
+                        data.chart.forEach(c => summaryRows.push([c.fullDate, c.omzet, c.laba]));
+                    }
+
+                    const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
+                    wsSummary['!cols'] = [{ wch: 32 }, { wch: 20 }, { wch: 20 }];
+                    XLSX.utils.book_append_sheet(workbook, wsSummary, 'Ringkasan Keuangan');
+                    sheetAdded = true;
+                }
+
+                if (sheets.products) {
+                    const productRows = [
+                        ['No', 'Nama Produk', 'Satuan', 'Qty Terjual', 'Total Omzet (Rp)', 'Estimasi Laba (Rp)'],
+                        ...(data.products || []).map((p, idx) => [
+                            idx + 1,
+                            p.name,
+                            p.unit,
+                            p.sold,
+                            p.revenue,
+                            p.profit ?? 0,
+                        ]),
+                    ];
+                    const wsProducts = XLSX.utils.aoa_to_sheet(productRows);
+                    wsProducts['!cols'] = [{ wch: 6 }, { wch: 30 }, { wch: 10 }, { wch: 14 }, { wch: 18 }, { wch: 18 }];
+                    XLSX.utils.book_append_sheet(workbook, wsProducts, 'Produk Terlaris');
+                    sheetAdded = true;
+                }
+
+                if (sheets.transactions) {
+                    const trxRows = [
+                        ['No. Nota', 'Waktu', 'Pelanggan', 'Metode', 'Jumlah Item', 'Total (Rp)'],
+                        ...(data.transactions || []).map(t => [
+                            t.id,
+                            t.fullTime,
+                            t.customer,
+                            t.method,
+                            t.itemsCount,
+                            t.total,
+                        ]),
+                    ];
+                    const wsTrx = XLSX.utils.aoa_to_sheet(trxRows);
+                    wsTrx['!cols'] = [{ wch: 14 }, { wch: 24 }, { wch: 22 }, { wch: 16 }, { wch: 14 }, { wch: 16 }];
+                    XLSX.utils.book_append_sheet(workbook, wsTrx, 'Riwayat Transaksi');
+                    sheetAdded = true;
+                }
+
+                if (sheets.payments) {
+                    const payRows = [
+                        ['Metode Pembayaran', 'Jumlah Transaksi', 'Total Nominal (Rp)', 'Persentase (%)'],
+                        ...(data.payments || []).map(pm => [
+                            pm.method,
+                            pm.trx,
+                            pm.amount,
+                            pm.percent,
+                        ]),
+                    ];
+                    const wsPay = XLSX.utils.aoa_to_sheet(payRows);
+                    wsPay['!cols'] = [{ wch: 22 }, { wch: 18 }, { wch: 20 }, { wch: 16 }];
+                    XLSX.utils.book_append_sheet(workbook, wsPay, 'Rekap Pembayaran');
+                    sheetAdded = true;
+                }
+
+                if (!sheetAdded) {
+                    showToast('Pilih minimal 1 sheet untuk diunduh.');
+                    return;
+                }
+
+                const todayStamp = new Date().toISOString().slice(0, 10);
+                const filename = `Laporan_Toko_${data.fileSuffix}_${todayStamp}.xlsx`;
+                XLSX.writeFile(workbook, filename);
+                showToast(`Berhasil mengunduh ${filename}`);
+            }
+
             document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.period-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const next = btn.getAttribute('data-period');
                         appState.period = next;
-                        appState.selectedBarIndex = REPORT_DATA[next].defaultBarIndex;
+                        appState.selectedBarIndex = REPORT_DATA[next].defaultBarIndex ?? 0;
 
                         document.querySelectorAll('.period-btn').forEach(b => {
                             const active = b.getAttribute('data-period') === next;
@@ -657,17 +696,38 @@
                 });
 
                 const modal = document.getElementById('export-modal');
-                document.getElementById('open-export-btn').addEventListener('click', () => modal.classList.remove('hidden'));
-                document.getElementById('customize-export-btn').addEventListener('click', () => modal.classList.remove('hidden'));
+                const openExportModal = () => {
+                    appState.exportPeriod = appState.period;
+                    syncExportModalUI();
+                    modal.classList.remove('hidden');
+                };
+
+                document.getElementById('open-export-btn').addEventListener('click', openExportModal);
+                document.getElementById('customize-export-btn').addEventListener('click', openExportModal);
                 document.getElementById('close-export-btn').addEventListener('click', () => modal.classList.add('hidden'));
                 document.getElementById('export-backdrop').addEventListener('click', () => modal.classList.add('hidden'));
 
-                document.getElementById('quick-export-btn').addEventListener('click', () => {
-                    showToast('Mengunduh Laporan_Warung_Hari_Ini.xlsx...');
+                document.querySelectorAll('.export-period-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        appState.exportPeriod = btn.getAttribute('data-export-period');
+                        syncExportModalUI();
+                    });
                 });
+
+                document.querySelectorAll('.export-sheet-cb').forEach(cb => {
+                    cb.addEventListener('change', () => {
+                        appState.exportSheets[cb.value] = cb.checked;
+                        syncExportModalUI();
+                    });
+                });
+
+                document.getElementById('quick-export-btn').addEventListener('click', () => {
+                    exportToExcel(appState.period, { summary: true, products: true, transactions: true, payments: true });
+                });
+
                 document.getElementById('confirm-download-btn').addEventListener('click', () => {
                     modal.classList.add('hidden');
-                    showToast('Berhasil mengunduh file Excel!');
+                    exportToExcel(appState.exportPeriod, appState.exportSheets);
                 });
 
                 renderAll();

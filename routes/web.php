@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RestockController;
 use Illuminate\Support\Facades\Route;
 
@@ -50,13 +51,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Modul Promosi - Poster Generator
     Route::get('/promosi', [PromotionController::class, 'index'])->name('promosi.index');
+
+    // Modul Laporan Penjualan & Laba
+    Route::get('/laporan', [ReportController::class, 'index'])->name('laporan');
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/laporan', function () {
-        return view('laporan.index');
-    })->name('laporan');
-
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
