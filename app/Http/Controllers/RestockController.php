@@ -51,6 +51,116 @@ class RestockController extends Controller
         ]);
     }
 
+    public function show(int $id): View
+    {
+        Carbon::setLocale('id');
+
+        // Try to load from DB first; fall back to demo data built from real DB products if ID is 87–89
+        $restock = Restock::with(['user', 'restockDetails.product'])->find($id);
+
+        if ($restock) {
+            $totalQty = $restock->restockDetails->sum('quantity');
+            $details = $restock->restockDetails->map(fn ($d) => [
+                'name' => $d->product?->name ?? 'Produk',
+                'unit' => $d->product?->unit ?? 'pcs',
+                'qty' => $d->quantity,
+                'buy' => (float) $d->purchase_price,
+                'sell' => (float) $d->selling_price,
+                'subtotal' => (float) $d->subtotal,
+            ])->toArray();
+
+            $datePart = Carbon::parse($restock->restock_date)->translatedFormat('d M Y');
+            $timePart = $restock->created_at ? $restock->created_at->format('H:i').' WIB' : '';
+
+            $data = [
+                'code' => '#RST-'.date('Y', strtotime($restock->restock_date)).'-'.str_pad((string) $restock->id, 3, '0', STR_PAD_LEFT),
+                'time' => trim($datePart.($timePart !== '' ? ', '.$timePart : '')),
+                'author' => $restock->user?->name ?? 'Mas Adil',
+                'notes' => $restock->notes,
+                'details' => $details,
+                'total_cost' => (float) $restock->total_cost,
+                'total_qty' => $totalQty,
+            ];
+        } else {
+            // Fallback demo entries built from actual products in the database
+            $dbProducts = Product::where('is_active', true)->orderBy('id')->get();
+            $makeDetail = function (?Product $product, int $qty): ?array {
+                if (! $product) {
+                    return null;
+                }
+
+                $buy = (float) $product->current_purchase_price;
+                $sell = (float) $product->current_selling_price;
+
+                return [
+                    'name' => $product->name,
+                    'unit' => $product->unit,
+                    'qty' => $qty,
+                    'buy' => $buy,
+                    'sell' => $sell,
+                    'subtotal' => $qty * $buy,
+                ];
+            };
+
+            $buildMock = function (string $code, string $time, string $notes, array $items) use ($makeDetail): array {
+                $details = [];
+                foreach ($items as [$product, $qty]) {
+                    $row = $makeDetail($product, $qty);
+                    if ($row !== null) {
+                        $details[] = $row;
+                    }
+                }
+
+                return [
+                    'code' => $code,
+                    'time' => $time,
+                    'author' => 'Mas Adil (Owner)',
+                    'notes' => $notes,
+                    'details' => $details,
+                    'total_cost' => collect($details)->sum('subtotal'),
+                    'total_qty' => collect($details)->sum('qty'),
+                ];
+            };
+
+            $mocks = [
+                88 => $buildMock(
+                    '#RST-'.date('Y').'-088',
+                    Carbon::now()->subDays(1)->translatedFormat('d M Y').', 14:15 WIB',
+                    'Kulakan mingguan agen sembako. Penambahan stok produk utama toko.',
+                    [
+                        [$dbProducts->get(0), 10],
+                        [$dbProducts->get(1), 24],
+                        [$dbProducts->get(2), 15],
+                    ]
+                ),
+                89 => $buildMock(
+                    '#RST-'.date('Y').'-089',
+                    'Hari Ini, 09:30 WIB',
+                    'Restock stok sembako dan kebutuhan harian menjelang akhir pekan.',
+                    [
+                        [$dbProducts->get(0), 15],
+                        [$dbProducts->get(3), 20],
+                        [$dbProducts->get(4), 100],
+                    ]
+                ),
+                87 => $buildMock(
+                    '#RST-'.date('Y').'-087',
+                    Carbon::now()->subDays(5)->translatedFormat('d M Y').', 10:00 WIB',
+                    'Kulakan produk minuman dan kebutuhan rumah tangga.',
+                    [
+                        [$dbProducts->get(6), 40],
+                        [$dbProducts->get(7), 30],
+                        [$dbProducts->get(10), 20],
+                    ]
+                ),
+            ];
+
+            $data = $mocks[$id] ?? abort(404);
+        }
+
+        return view('restocks.show', $data);
+    }
+
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
@@ -81,7 +191,7 @@ class RestockController extends Controller
             foreach ($request->items as $item) {
                 $product = Product::findOrFail($item['product_id']);
                 $subtotal = $item['quantity'] * $item['purchase_price'];
-                $sellPrice = !empty($item['selling_price']) ? $item['selling_price'] : $product->current_selling_price;
+                $sellPrice = ! empty($item['selling_price']) ? $item['selling_price'] : $product->current_selling_price;
 
                 RestockDetail::create([
                     'restock_id' => $restock->id,
