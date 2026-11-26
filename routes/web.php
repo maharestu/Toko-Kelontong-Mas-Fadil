@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\RestockController;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +42,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/restocks', [RestockController::class, 'index'])->name('restocks.index');
     Route::post('/restocks', [RestockController::class, 'store'])->name('restocks.store');
+
+    // Modul Promosi - Poster Generator
+    Route::get('/promosi', [PromotionController::class, 'index'])->name('promosi.index');
 });
 
 Route::middleware('auth')->group(function () {
