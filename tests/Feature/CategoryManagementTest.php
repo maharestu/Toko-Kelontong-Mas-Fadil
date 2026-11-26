@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Enums\UserRole;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -17,9 +19,44 @@ class CategoryManagementTest extends TestCase
         $this->withoutVite();
     }
 
+    protected function createAdmin(): User
+    {
+        return User::factory()->create(['role' => UserRole::Admin]);
+    }
+
+    public function test_category_routes_redirect_unauthenticated_users_to_login(): void
+    {
+        $category = Category::create(['name' => 'Sembako']);
+
+        $this->get(route('categories.index'))->assertRedirect(route('login'));
+        $this->post(route('categories.store'), ['name' => 'Minuman'])->assertRedirect(route('login'));
+        $this->put(route('categories.update', $category), ['name' => 'Diubah'])->assertRedirect(route('login'));
+        $this->delete(route('categories.destroy', $category))->assertRedirect(route('login'));
+
+        $this->assertDatabaseHas('categories', ['id' => $category->id, 'name' => 'Sembako']);
+        $this->assertDatabaseMissing('categories', ['name' => 'Minuman']);
+    }
+
+    public function test_non_admin_users_cannot_access_or_modify_categories(): void
+    {
+        $category = Category::create(['name' => 'Sembako']);
+
+        foreach ([UserRole::Kasir, UserRole::Kurir] as $role) {
+            $user = User::factory()->create(['role' => $role]);
+
+            $this->actingAs($user)->get(route('categories.index'))->assertForbidden();
+            $this->actingAs($user)->post(route('categories.store'), ['name' => 'Baru'])->assertForbidden();
+            $this->actingAs($user)->put(route('categories.update', $category), ['name' => 'Ubah'])->assertForbidden();
+            $this->actingAs($user)->delete(route('categories.destroy', $category))->assertForbidden();
+        }
+
+        $this->assertDatabaseHas('categories', ['id' => $category->id, 'name' => 'Sembako']);
+        $this->assertDatabaseMissing('categories', ['name' => 'Baru']);
+    }
+
     public function test_renders_category_index_page_successfully(): void
     {
-        $response = $this->get(route('categories.index'));
+        $response = $this->actingAs($this->createAdmin())->get(route('categories.index'));
 
         $response->assertStatus(200);
         $response->assertSee('Kelola Kategori');
@@ -41,7 +78,7 @@ class CategoryManagementTest extends TestCase
             'is_active' => true,
         ]);
 
-        $response = $this->get(route('categories.index'));
+        $response = $this->actingAs($this->createAdmin())->get(route('categories.index'));
 
         $response->assertStatus(200);
         $response->assertSee('Sembako');
@@ -50,7 +87,7 @@ class CategoryManagementTest extends TestCase
 
     public function test_stores_new_category_successfully(): void
     {
-        $response = $this->post(route('categories.store'), [
+        $response = $this->actingAs($this->createAdmin())->post(route('categories.store'), [
             'name' => 'Minuman Segar',
         ]);
 
@@ -63,15 +100,17 @@ class CategoryManagementTest extends TestCase
 
     public function test_validates_category_name_when_storing(): void
     {
+        $admin = $this->createAdmin();
+
         // Name wajib diisi
-        $emptyResponse = $this->post(route('categories.store'), [
+        $emptyResponse = $this->actingAs($admin)->post(route('categories.store'), [
             'name' => '',
         ]);
         $emptyResponse->assertSessionHasErrors('name');
 
         // Name harus unik
         Category::create(['name' => 'Kopi']);
-        $duplicateResponse = $this->post(route('categories.store'), [
+        $duplicateResponse = $this->actingAs($admin)->post(route('categories.store'), [
             'name' => 'Kopi',
         ]);
         $duplicateResponse->assertSessionHasErrors('name');
@@ -81,7 +120,7 @@ class CategoryManagementTest extends TestCase
     {
         $category = Category::create(['name' => 'Bumbu Masak']);
 
-        $response = $this->put(route('categories.update', $category), [
+        $response = $this->actingAs($this->createAdmin())->put(route('categories.update', $category), [
             'name' => 'Bumbu & Rempah',
         ]);
 
@@ -97,7 +136,7 @@ class CategoryManagementTest extends TestCase
     {
         $category = Category::create(['name' => 'Peralatan Listrik']);
 
-        $response = $this->delete(route('categories.destroy', $category));
+        $response = $this->actingAs($this->createAdmin())->delete(route('categories.destroy', $category));
 
         $response->assertRedirect(route('categories.index'));
         $response->assertSessionHas('success');
@@ -120,7 +159,7 @@ class CategoryManagementTest extends TestCase
             'is_active' => true,
         ]);
 
-        $response = $this->delete(route('categories.destroy', $category));
+        $response = $this->actingAs($this->createAdmin())->delete(route('categories.destroy', $category));
 
         $response->assertRedirect(route('categories.index'));
         $response->assertSessionHas('error');

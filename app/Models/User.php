@@ -33,6 +33,14 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Periksa apakah pengguna memiliki role Admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === UserRole::Admin;
+    }
+
     public function sales(): HasMany
     {
         return $this->hasMany(Sale::class);

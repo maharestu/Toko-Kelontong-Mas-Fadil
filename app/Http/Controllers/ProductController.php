@@ -113,8 +113,10 @@ class ProductController extends Controller
     /**
      * Remove the specified product from storage.
      */
-    public function destroy(Product $product): RedirectResponse
+    public function destroy(Request $request, Product $product): RedirectResponse
     {
+        abort_unless($request->user()?->isAdmin() ?? false, 403);
+
         if ($product->saleDetails()->exists() || $product->restockDetails()->exists()) {
             return redirect()
                 ->route('products.index')

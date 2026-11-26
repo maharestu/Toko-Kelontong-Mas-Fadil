@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\UserRole;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Sale;
@@ -22,6 +23,11 @@ class ProductManagementTest extends TestCase
         $this->withoutVite();
     }
 
+    protected function createAdmin(): User
+    {
+        return User::factory()->create(['role' => UserRole::Admin]);
+    }
+
     /**
      * Helper membuat dummy gambar valid tanpa membutuhkan ekstensi GD PHP.
      */
@@ -30,6 +36,88 @@ class ProductManagementTest extends TestCase
         $pngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
 
         return UploadedFile::fake()->createWithContent($name, base64_decode($pngBase64));
+    }
+
+    public function test_product_routes_redirect_unauthenticated_users_to_login(): void
+    {
+        $category = Category::create(['name' => 'Sembako']);
+        $product = Product::create([
+            'category_id' => $category->id,
+            'name' => 'Beras Pandan Wangi 5kg',
+            'unit' => 'karung',
+            'stock' => 15,
+            'current_purchase_price' => 70000,
+            'current_selling_price' => 80000,
+            'is_active' => true,
+        ]);
+
+        $this->get(route('products.index'))->assertRedirect(route('login'));
+        $this->get(route('products.create'))->assertRedirect(route('login'));
+        $this->post(route('products.store'), ['name' => 'Produk Baru'])->assertRedirect(route('login'));
+        $this->get(route('products.edit', $product))->assertRedirect(route('login'));
+        $this->put(route('products.update', $product), ['name' => 'Produk Diubah'])->assertRedirect(route('login'));
+        $this->delete(route('products.destroy', $product))->assertRedirect(route('login'));
+
+        $this->assertDatabaseHas('products', ['id' => $product->id, 'name' => 'Beras Pandan Wangi 5kg']);
+        $this->assertDatabaseMissing('products', ['name' => 'Produk Baru']);
+    }
+
+    public function test_non_admin_users_cannot_access_or_modify_products(): void
+    {
+        $category = Category::create(['name' => 'Sembako']);
+        $product = Product::create([
+            'category_id' => $category->id,
+            'name' => 'Beras Pandan Wangi 5kg',
+            'unit' => 'karung',
+            'stock' => 15,
+            'current_purchase_price' => 70000,
+            'current_selling_price' => 80000,
+            'is_active' => true,
+        ]);
+
+        foreach ([UserRole::Kasir, UserRole::Kurir] as $role) {
+            $user = User::factory()->create(['role' => $role]);
+
+            $this->actingAs($user)->get(route('products.index'))->assertForbidden();
+            $this->actingAs($user)->get(route('products.create'))->assertForbidden();
+            $this->actingAs($user)->post(route('products.store'), [
+                'category_id' => $category->id,
+                'name' => 'Produk Ilegal',
+                'unit' => 'pcs',
+                'stock' => 1,
+                'current_purchase_price' => 1000,
+                'current_selling_price' => 2000,
+            ])->assertForbidden();
+            $this->actingAs($user)->get(route('products.edit', $product))->assertForbidden();
+            $this->actingAs($user)->put(route('products.update', $product), [
+                'category_id' => $category->id,
+                'name' => 'Beras Diubah',
+                'unit' => 'karung',
+                'stock' => 10,
+                'current_purchase_price' => 70000,
+                'current_selling_price' => 80000,
+            ])->assertForbidden();
+            $this->actingAs($user)->delete(route('products.destroy', $product))->assertForbidden();
+        }
+
+        $this->assertDatabaseHas('products', ['id' => $product->id, 'name' => 'Beras Pandan Wangi 5kg']);
+        $this->assertDatabaseMissing('products', ['name' => 'Produk Ilegal']);
+    }
+
+    public function test_bottom_navigation_shows_products_link_only_for_admin(): void
+    {
+        $admin = $this->createAdmin();
+        $kasir = User::factory()->create(['role' => UserRole::Kasir]);
+
+        $this->actingAs($admin)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee(route('products.index'), false);
+
+        $this->actingAs($kasir)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertDontSee(route('products.index'), false);
     }
 
     public function test_renders_product_index_page_successfully(): void
@@ -45,7 +133,7 @@ class ProductManagementTest extends TestCase
             'is_active' => true,
         ]);
 
-        $response = $this->get(route('products.index'));
+        $response = $this->actingAs($this->createAdmin())->get(route('products.index'));
 
         $response->assertStatus(200);
         $response->assertSee('Kelola Produk');
@@ -56,7 +144,7 @@ class ProductManagementTest extends TestCase
     {
         Category::create(['name' => 'Sembako']);
 
-        $response = $this->get(route('products.create'));
+        $response = $this->actingAs($this->createAdmin())->get(route('products.create'));
 
         $response->assertStatus(200);
         $response->assertSee('Tambah Produk Baru');
@@ -76,7 +164,7 @@ class ProductManagementTest extends TestCase
             'is_active' => true,
         ]);
 
-        $response = $this->get(route('products.edit', $product));
+        $response = $this->actingAs($this->createAdmin())->get(route('products.edit', $product));
 
         $response->assertStatus(200);
         $response->assertSee('Edit Produk');
@@ -105,7 +193,7 @@ class ProductManagementTest extends TestCase
             'is_active' => true,
         ]);
 
-        $response = $this->get(route('products.index', ['search' => 'Beras']));
+        $response = $this->actingAs($this->createAdmin())->get(route('products.index', ['search' => 'Beras']));
 
         $response->assertStatus(200);
         $response->assertSee('Beras Rojolele 5kg');
@@ -136,7 +224,7 @@ class ProductManagementTest extends TestCase
             'is_active' => true,
         ]);
 
-        $response = $this->get(route('products.index', ['category_id' => $category1->id]));
+        $response = $this->actingAs($this->createAdmin())->get(route('products.index', ['category_id' => $category1->id]));
 
         $response->assertStatus(200);
         $response->assertSee('Teh Botol Sosro');
@@ -165,7 +253,7 @@ class ProductManagementTest extends TestCase
             'is_active' => true,
         ]);
 
-        $response = $this->get(route('products.index', ['stock_status' => 'out']));
+        $response = $this->actingAs($this->createAdmin())->get(route('products.index', ['stock_status' => 'out']));
 
         $response->assertStatus(200);
         $response->assertSee('Beras Habis');
@@ -190,7 +278,7 @@ class ProductManagementTest extends TestCase
             'image' => $fakeImage,
         ];
 
-        $response = $this->post(route('products.store'), $payload);
+        $response = $this->actingAs($this->createAdmin())->post(route('products.store'), $payload);
 
         $response->assertRedirect(route('products.index'));
         $response->assertSessionHas('success');
@@ -207,7 +295,7 @@ class ProductManagementTest extends TestCase
 
     public function test_validates_required_fields_when_storing_product(): void
     {
-        $response = $this->post(route('products.store'), []);
+        $response = $this->actingAs($this->createAdmin())->post(route('products.store'), []);
 
         $response->assertSessionHasErrors([
             'name',
@@ -253,7 +341,7 @@ class ProductManagementTest extends TestCase
             'image' => $newImage,
         ];
 
-        $response = $this->put(route('products.update', $product), $updatePayload);
+        $response = $this->actingAs($this->createAdmin())->put(route('products.update', $product), $updatePayload);
 
         $response->assertRedirect(route('products.index'));
         $response->assertSessionHas('success');
@@ -286,7 +374,7 @@ class ProductManagementTest extends TestCase
             'image' => $imagePath,
         ]);
 
-        $response = $this->delete(route('products.destroy', $product));
+        $response = $this->actingAs($this->createAdmin())->delete(route('products.destroy', $product));
 
         $response->assertRedirect(route('products.index'));
         $response->assertSessionHas('success');
@@ -327,7 +415,7 @@ class ProductManagementTest extends TestCase
             'subtotal' => 30000,
         ]);
 
-        $response = $this->delete(route('products.destroy', $product));
+        $response = $this->actingAs($this->createAdmin())->delete(route('products.destroy', $product));
 
         $response->assertRedirect(route('products.index'));
         $response->assertSessionHas('error');

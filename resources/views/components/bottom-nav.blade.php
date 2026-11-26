@@ -3,6 +3,7 @@
 ])
 
 @php
+    $canManageProducts = Auth::user()?->isAdmin() ?? false;
     $isHome = $active ? $active === 'home' : request()->routeIs('dashboard');
     $isProduk = $active ? $active === 'produk' : (request()->routeIs('products.*') || request()->routeIs('categories.*'));
     $isKasir = $active ? $active === 'kasir' : (request()->routeIs('cashier.*') || request()->routeIs('sales.*'));
@@ -15,7 +16,7 @@
 <!-- Bottom Navigation Bar (Fixed at Viewport Bottom, Aligned to 500px Container) -->
 <nav aria-label="Navigasi Utama" class="fixed bottom-0 left-0 right-0 z-40 pointer-events-none">
     <div class="pointer-events-auto max-w-[500px] mx-auto bg-white/95 backdrop-blur-md border-t border-x border-gray-100 px-3 py-2.5 sm:rounded-t-2xl shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.06)]">
-        <div class="grid grid-cols-5 items-center justify-items-center">
+        <div class="grid {{ $canManageProducts ? 'grid-cols-5' : 'grid-cols-4' }} items-center justify-items-center">
             <!-- Home -->
             <a href="{{ route('dashboard') }}" class="flex flex-col items-center gap-1 {{ $isHome ? 'text-[#173628]' : 'text-gray-400 hover:text-gray-700 transition' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $isHome ? '2.2' : '2' }}" stroke-linecap="round" stroke-linejoin="round">
@@ -25,14 +26,16 @@
                 <span class="text-[10px] {{ $isHome ? 'font-semibold text-[#173628]' : 'font-medium' }} tracking-tight">Home</span>
             </a>
 
-            <!-- Produk -->
-            <a href="{{ route('products.index') }}" class="flex flex-col items-center gap-1 {{ $isProduk ? 'text-[#173628]' : 'text-gray-400 hover:text-gray-700 transition' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $isProduk ? '2.2' : '2' }}" stroke-linecap="round" stroke-linejoin="round">
-                    <rect width="20" height="14" x="2" y="7" rx="2" ry="2"/>
-                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                </svg>
-                <span class="text-[10px] {{ $isProduk ? 'font-semibold text-[#173628]' : 'font-medium' }} tracking-tight">Produk</span>
-            </a>
+            @if ($canManageProducts)
+                <!-- Produk -->
+                <a href="{{ route('products.index') }}" class="flex flex-col items-center gap-1 {{ $isProduk ? 'text-[#173628]' : 'text-gray-400 hover:text-gray-700 transition' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $isProduk ? '2.2' : '2' }}" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="20" height="14" x="2" y="7" rx="2" ry="2"/>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                    </svg>
+                    <span class="text-[10px] {{ $isProduk ? 'font-semibold text-[#173628]' : 'font-medium' }} tracking-tight">Produk</span>
+                </a>
+            @endif
 
             <!-- Kasir -->
             <a href="{{ route('cashier.index') }}" class="flex flex-col items-center gap-1 {{ $isKasir ? 'text-[#173628]' : 'text-gray-400 hover:text-gray-700 transition' }}">

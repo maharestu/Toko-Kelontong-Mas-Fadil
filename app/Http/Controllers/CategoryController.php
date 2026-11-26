@@ -57,8 +57,10 @@ class CategoryController extends Controller
     /**
      * Remove the specified category from storage.
      */
-    public function destroy(Category $category): RedirectResponse
+    public function destroy(Request $request, Category $category): RedirectResponse
     {
+        abort_unless($request->user()?->isAdmin() ?? false, 403);
+
         // Proteksi integritas relasi foreign key (restrictOnDelete)
         if ($category->products()->exists()) {
             $productCount = $category->products()->count();
